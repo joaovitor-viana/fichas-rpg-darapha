@@ -1,53 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const PlayerView = () => {
+  const { id } = useParams();
   const { user } = useAuth();
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
+    if (user && id) {
       fetchPlayerData();
     }
-  }, [user]);
+  }, [user, id]);
 
   const fetchPlayerData = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase
-        .from('players')
+        .from('characters')
         .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
+        .eq('id', id)
+        .single();
 
       if (error) throw error;
-      
-      if (!data) {
-        // Create initial player if not found
-        const { data: newData, error: insertError } = await supabase
-          .from('players')
-          .insert([{ 
-            id: user.id, 
-            nome: 'Alma Recém-Chegada',
-            vida: 100,
-            fome: 0,
-            sede: 0,
-            sexo: 'Desconhecido',
-            idade: 0
-          }])
-          .select()
-          .single();
-        
-        if (insertError) throw insertError;
-        setPlayer(newData);
-      } else {
-        setPlayer(data);
-      }
+      setPlayer(data);
     } catch (err) {
-      console.error('Error fetching player:', err.message);
+      console.error('Error fetching character:', err.message);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -62,9 +45,9 @@ const PlayerView = () => {
     setSaving(true);
     try {
       const { error } = await supabase
-        .from('players')
+        .from('characters')
         .update(player)
-        .eq('id', user.id);
+        .eq('id', id);
 
       if (error) throw error;
       alert('Selo rúnico aplicado com sucesso!');
@@ -143,6 +126,9 @@ const PlayerView = () => {
           <h1 className="font-cinzel text-xl font-bold tracking-widest uppercase text-slate-100">Grimório Sombrio</h1>
         </div>
         <div className="flex gap-4">
+          <Link to="/dashboard" className="flex items-center justify-center rounded-lg h-10 px-4 group hover:bg-slate-800 transition-all">
+            <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
+          </Link>
           <button onClick={() => supabase.auth.signOut()} className="flex items-center justify-center rounded-lg h-10 px-4 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all text-sm font-bold">
             SAIR
           </button>
