@@ -6,6 +6,7 @@ const PlayerView = () => {
   const { user } = useAuth();
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -35,7 +36,7 @@ const PlayerView = () => {
             fome: 0,
             sede: 0,
             sexo: 'Desconhecido',
-            idade: '0'
+            idade: 0
           }])
           .select()
           .single();
@@ -45,8 +46,9 @@ const PlayerView = () => {
       } else {
         setPlayer(data);
       }
-    } catch (error) {
-      console.error('Error fetching player:', error.message);
+    } catch (err) {
+      console.error('Error fetching player:', err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -99,7 +101,39 @@ const PlayerView = () => {
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-primary font-cinzel text-2xl animate-pulse">Invocando Ficha...</div>;
-  if (!player) return <div className="min-h-screen flex items-center justify-center text-slate-400">Nenhuma alma vinculada encontrada.</div>;
+  
+  if (error) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+      <div className="spider-web-overlay fixed inset-0 opacity-20"></div>
+      <span className="material-symbols-outlined text-primary text-6xl mb-4">skull</span>
+      <h2 className="font-cinzel text-2xl mb-2 text-slate-100 uppercase tracking-widest">Sussurro das Sombras</h2>
+      <p className="text-slate-400 italic mb-6 max-w-md">"Uma barreira impede o Grimório de ler sua alma..."</p>
+      <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg font-mono text-xs text-primary/80 mb-8 max-w-lg overflow-x-auto">
+        Erro: {error}
+      </div>
+      <button 
+        onClick={() => window.location.reload()}
+        className="rust-hover px-8 py-4 bg-stone border border-slate-700 text-slate-400 font-display text-xs tracking-widest uppercase"
+      >
+        Tentar Invocação Novamente
+      </button>
+    </div>
+  );
+
+  if (!player) return (
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+      <div className="spider-web-overlay fixed inset-0 opacity-20"></div>
+      <span className="material-symbols-outlined text-slate-600 text-6xl mb-4">person_off</span>
+      <h2 className="font-cinzel text-2xl mb-2 text-slate-100 uppercase tracking-widest text-slate-500">Alma Desgarrada</h2>
+      <p className="text-slate-400 italic mb-6 max-w-md">Nenhuma alma vinculada foi encontrada para este usuário.</p>
+      <button 
+        onClick={() => supabase.auth.signOut()}
+        className="rust-hover px-8 py-4 bg-stone border border-slate-700 text-slate-400 font-display text-xs tracking-widest uppercase"
+      >
+        Voltar ao Portal
+      </button>
+    </div>
+  );
 
   return (
     <div className="bg-background-dark font-display text-slate-100 min-h-screen pb-20">
