@@ -89,7 +89,7 @@ const PlayerView = () => {
         </div>
         <div className="flex gap-4">
           <button onClick={() => supabase.auth.signOut()} className="flex items-center justify-center rounded-lg h-10 px-4 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all text-sm font-bold">
-            LOGOUT
+            SAIR
           </button>
         </div>
       </header>
