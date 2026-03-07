@@ -236,9 +236,9 @@ const PlayerView = () => {
                     className="size-56 rounded-full border-4 border border-black bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
                   >
                     {!player.token && (
-                      <div className="flex flex-col items-center justify-center text-slate-800 opacity-40">
-                        <span className="material-symbols-outlined text-7xl">person</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest mt-2">Sem Imagem</span>
+                      <div className="flex flex-col items-center justify-center text-slate-400">
+                        <span className="material-symbols-outlined text-7xl opacity-40">person</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-60">Sem Imagem</span>
                       </div>
                     )}
                     {player.token && (
