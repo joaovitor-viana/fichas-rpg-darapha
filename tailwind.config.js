@@ -7,13 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        "primary": "#b83d14",
+        "primary": "#ffffff", // Branco Puro/Acinzentado para destaque
         "background-light": "#f8f6f6",
-        "background-dark": "#1a0f0c",
-        "vellum": "#2a1f1b",
-        "iron": "#4a3730",
+        "background-dark": "#0a0a0a", // Preto absoluto do login
+        "vellum": "#1a1a1a",
+        "iron": "#333333",
+        "stone": "#1a1a1a",
         "off-white": "#f1f5f9",
-        "muted-slate": "#94a3b8"
+        "muted-slate": "#475569"
       },
       fontFamily: {
         "display": ["Newsreader", "serif"]
