@@ -103,7 +103,9 @@ const PlayerView = () => {
         pixelRatio: 2,
         cacheBust: true,
         style: {
-          borderRadius: '0', // Remover bordas arredondadas na exportação se desejar 1:1
+          borderRadius: '0', 
+          margin: '0',
+          padding: '40px' // Margem extra para evitar corte
         }
       };
 
@@ -114,13 +116,18 @@ const PlayerView = () => {
         link.href = dataUrl;
         link.click();
       } else if (type === 'pdf') {
-        const dataUrl = await htmlToImage.toPng(element, { ...options, pixelRatio: 1.5 });
+        // Aumentar o tempo de espera para garantir renderização completa antes do PDF
+        await new Promise(r => setTimeout(r, 100));
+        
+        const dataUrl = await htmlToImage.toPng(element, { ...options, pixelRatio: 2 });
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgProps = pdf.getImageProperties(dataUrl);
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
-        pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        // Se a altura do PDF for maior que uma página, ele vai cortar. 
+        // Aqui garantimos que caiba ou pelo menos que a escala esteja correta.
+        pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         pdf.save(`FICHA-${player.nome || 'personagem'}.pdf`);
       }
     } catch (err) {
@@ -164,7 +171,6 @@ const PlayerView = () => {
         </div>
         
         <div className="flex items-center gap-4">
-          {/* HUD DE EXPORTAÇÃO INTEGRADO */}
           <div className="flex bg-white/5 p-1 rounded-lg border border-white/10 shadow-inner">
              <button 
               onClick={() => handleExport('jpg')} 
@@ -231,7 +237,7 @@ const PlayerView = () => {
                   </div>
                   <div className="flex flex-col items-center lg:items-start group">
                     <span className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-1 group-hover:text-primary transition-colors">Sexo</span>
-                    <input className="bg-transparent border-b border-slate-900 focus:border-primary focus:ring-0 p-1 text-white font-cinzel text-3xl w-40 text-center lg:text-left uppercase" value={player.sexo || ''} onChange={(e) => handleUpdate('sexo', e.target.value)} />
+                    <input className="bg-transparent border-b border-slate-900 focus:border-primary focus:ring-0 p-1 text-white font-cinzel text-3xl min-w-[320px] text-center lg:text-left uppercase" value={player.sexo || ''} onChange={(e) => handleUpdate('sexo', e.target.value)} placeholder="MASC / FEM / NB" />
                   </div>
                </div>
             </div>
