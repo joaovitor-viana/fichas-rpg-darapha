@@ -14,41 +14,22 @@ const Register = () => {
     setLoading(true);
     
     try {
-      // 1. Sign up user
+      // 1. Sign up user with metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: nome,
+            is_gm: false
+          }
+        }
       });
 
       if (authError) throw authError;
 
-      const user = authData.user;
-      if (user) {
-        // 2. Create entry in users table (as a Player by default)
-        const { error: userError } = await supabase
-          .from('users')
-          .insert([{ id: user.id, is_gm: false }]);
-
-        if (userError) throw userError;
-
-        // 3. Create entry in players table
-        const { error: playerError } = await supabase
-          .from('players')
-          .insert([{ 
-            id: user.id, 
-            nome: nome,
-            vida: 100,
-            fome: 0,
-            sede: 0,
-            sexo: 'Desconhecido',
-            idade: '0'
-          }]);
-
-        if (playerError) throw playerError;
-
-        alert('Sua alma foi vinculada ao grimório! Faça login agora.');
-        navigate('/login');
-      }
+      alert('Sua alma foi convocada! Se a confirmação de e-mail estiver ativa, verifique sua caixa. Caso contrário, já pode entrar.');
+      navigate('/login');
     } catch (error) {
       alert('Erro ao invocar alma: ' + error.message);
     } finally {
