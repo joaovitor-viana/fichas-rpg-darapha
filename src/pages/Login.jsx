@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 
 const Login = () => {
@@ -101,8 +101,8 @@ const Login = () => {
             </button>
           </form>
           <div className="mt-8 flex justify-between items-center text-[10px] font-display uppercase tracking-widest text-slate-600">
-            <a className="hover:text-slate-400 transition-colors" href="#">Perdeu seu caminho?</a>
-            <a className="hover:text-slate-400 transition-colors" href="#">Invocar nova alma</a>
+            <Link className="hover:text-slate-400 transition-colors" to="/forgot-password">Perdeu seu caminho?</Link>
+            <Link className="hover:text-slate-400 transition-colors" to="/register">Invocar nova alma</Link>
           </div>
         </div>
       </div>
