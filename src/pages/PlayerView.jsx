@@ -43,10 +43,12 @@ const PlayerView = () => {
 
   const saveChanges = async () => {
     setSaving(true);
+    const { id: charId, user_id, updated_at, ...updateData } = player;
+    setSaving(true);
     try {
       const { error } = await supabase
         .from('characters')
-        .update(player)
+        .update(updateData)
         .eq('id', id);
 
       if (error) throw error;
