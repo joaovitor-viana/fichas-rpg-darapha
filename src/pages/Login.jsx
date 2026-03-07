@@ -40,6 +40,14 @@ const Login = () => {
       <div className="fixed inset-0 spider-web-overlay pointer-events-none"></div>
       <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-[600px] h-[400px] candle-glow pointer-events-none"></div>
 
+      <Link 
+        to="/" 
+        className="fixed top-8 left-8 z-50 flex items-center gap-2 text-slate-600 hover:text-white transition-all group"
+      >
+        <span className="material-symbols-outlined text-2xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+        <span className="text-[10px] uppercase font-black tracking-widest">Voltar para Home</span>
+      </Link>
+
       <div className="relative w-full max-w-md">
         <header className="flex flex-col items-center gap-6 mb-12">
           <div className="flex items-center justify-center size-16 border-2 border-slate-500 rounded-full bg-black/50 shadow-lg">
