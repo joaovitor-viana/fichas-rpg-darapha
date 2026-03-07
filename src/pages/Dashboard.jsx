@@ -52,8 +52,8 @@ const Dashboard = () => {
           user_id: user.id, 
           nome: 'Nova Alma',
           vida: 100,
-          fome: 0,
-          sede: 0
+          fome: 100,
+          sede: 100
         }])
         .select()
         .single();
