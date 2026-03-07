@@ -29,11 +29,7 @@ const Login = () => {
         .eq('id', session.user.id)
         .single();
       
-      if (userProfile?.is_gm) {
-        navigate('/gm');
-      } else {
-        navigate('/player');
-      }
+      navigate('/dashboard');
     }
     setLoading(false);
   };
