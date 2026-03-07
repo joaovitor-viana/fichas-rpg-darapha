@@ -20,10 +20,31 @@ const PlayerView = () => {
         .from('players')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setPlayer(data);
+      
+      if (!data) {
+        // Create initial player if not found
+        const { data: newData, error: insertError } = await supabase
+          .from('players')
+          .insert([{ 
+            id: user.id, 
+            nome: 'Alma Recém-Chegada',
+            vida: 100,
+            fome: 0,
+            sede: 0,
+            sexo: 'Desconhecido',
+            idade: '0'
+          }])
+          .select()
+          .single();
+        
+        if (insertError) throw insertError;
+        setPlayer(newData);
+      } else {
+        setPlayer(data);
+      }
     } catch (error) {
       console.error('Error fetching player:', error.message);
     } finally {
