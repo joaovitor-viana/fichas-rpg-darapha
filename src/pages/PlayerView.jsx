@@ -98,14 +98,14 @@ const PlayerView = () => {
       
       // Opções para garantir alta qualidade e visual fiel
       const options = {
-        quality: 0.95,
+        quality: 1,
         backgroundColor: '#0a0a0a',
         pixelRatio: 2,
         cacheBust: true,
         style: {
           borderRadius: '0', 
           margin: '0',
-          padding: '40px' // Margem extra para evitar corte
+          paddingBottom: '60px' // Margem extra para evitar corte no PDF
         }
       };
 
@@ -116,17 +116,24 @@ const PlayerView = () => {
         link.href = dataUrl;
         link.click();
       } else if (type === 'pdf') {
-        // Aumentar o tempo de espera para garantir renderização completa antes do PDF
-        await new Promise(r => setTimeout(r, 100));
-        
+        // Renderizar para PNG para manter transparência/qualidade
         const dataUrl = await htmlToImage.toPng(element, { ...options, pixelRatio: 2 });
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(dataUrl);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         
-        // Se a altura do PDF for maior que uma página, ele vai cortar. 
-        // Aqui garantimos que caiba ou pelo menos que a escala esteja correta.
+        // Criar o PDF com o exato tamanho do conteúdo
+        const img = new Image();
+        img.src = dataUrl;
+        await new Promise(r => img.onload = r);
+
+        // Calcular dimensões (conversão de pixels para mm, aprox. 1px = 0.264583mm)
+        const pdfWidth = 210; // Mantemos a largura A4 para consistência
+        const pdfHeight = (img.height * pdfWidth) / img.width;
+
+        const pdf = new jsPDF({
+          orientation: 'p',
+          unit: 'mm',
+          format: [pdfWidth, pdfHeight] // Tamanho DINÂMICO baseado na ficha
+        });
+
         pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         pdf.save(`FICHA-${player.nome || 'personagem'}.pdf`);
       }
@@ -211,9 +218,22 @@ const PlayerView = () => {
                <label htmlFor="token-upload" className="cursor-pointer block relative">
                   <div 
                     className="size-56 rounded-full border-4 border-slate-900 bg-cover bg-center overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
-                    style={{ backgroundImage: `url('${player.token || 'https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=400'}')` }}
+                    style={{ backgroundImage: `url('${player.token || ''}')` }}
                   >
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 flex flex-col items-center justify-center text-white gap-2">
+                    {!player.token && (
+                      <div className="flex flex-col items-center justify-center text-slate-700">
+                        <span className="material-symbols-outlined text-5xl">person</span>
+                      </div>
+                    )}
+                    {player.token && (
+                        <img 
+                          src={player.token} 
+                          alt="Token" 
+                          className="w-full h-full object-cover rounded-full"
+                          crossOrigin="anonymous" 
+                        />
+                    )}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 flex flex-col items-center justify-center text-white gap-2 rounded-full">
                        <span className="material-symbols-outlined text-4xl text-primary">add_a_photo</span>
                        <span className="text-[10px] font-black uppercase tracking-widest">Trocar Token</span>
                     </div>
