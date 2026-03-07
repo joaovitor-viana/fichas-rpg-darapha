@@ -125,7 +125,10 @@ const PlayerView = () => {
       </header>
 
       <main className="max-w-6xl mx-auto w-full p-4 md:p-12">
-        <div className="parchment-texture-dark rounded-xl p-8 md:p-12 flex flex-col gap-12 shadow-2xl relative">
+        <div className="parchment-texture burnt-edge rounded-xl p-8 md:p-12 flex flex-col gap-12 shadow-2xl relative">
+          <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+            {/* This div is for a decorative wax seal image/SVG, if desired */}
+          </div>
           
           {/* IDENTIDADE (Nome, Idade, Sexo, Token) */}
           <section className="flex flex-col lg:flex-row gap-12 items-center lg:items-end border-b border-slate-800 pb-12">
