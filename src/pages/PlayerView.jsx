@@ -13,6 +13,7 @@ const PlayerView = () => {
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [tokenBase64, setTokenBase64] = useState(null);
   const navigate = useNavigate();
   const sheetRef = useRef(null);
 
@@ -21,6 +22,24 @@ const PlayerView = () => {
       fetchPlayerData();
     }
   }, [user, id]);
+
+  // Efeito para converter o token em Base64 para evitar erros de CORS na exportação
+  useEffect(() => {
+    if (player?.token) {
+      fetch(player.token, { mode: 'cors' })
+        .then(response => response.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onloadend = () => setTokenBase64(reader.result);
+          reader.readAsDataURL(blob);
+        })
+        .catch(err => {
+          console.warn('Criação de Base64 para o token falhou (CORS provavelmente):', err);
+          // Fallback para a URL original se o fetch falhar
+          setTokenBase64(player.token);
+        });
+    }
+  }, [player?.token]);
 
   const fetchPlayerData = async () => {
     setLoading(true);
@@ -89,43 +108,30 @@ const PlayerView = () => {
     }
   };
 
-  // Função auxiliar para converter imagens externas em Base64 para evitar erros de CORS na exportação
-  const toDataURL = (url) => fetch(url)
-    .then(response => response.blob())
-    .then(blob => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    }));
-
   const handleExport = async (type = 'jpg') => {
     if (!sheetRef.current || exporting) return;
     
     setExporting(true);
     try {
       const element = sheetRef.current;
-      console.log('Iniciando exportação v5.8...');
+      console.log('Iniciando exportação crítica v5.9...');
 
-      // Preparação: Se houver token, tentamos garantir que ele está acessível
-      // O html-to-image às vezes falha com imagens externas mesmo com crossOrigin
-      // Mas para não atrasar muito, vamos tentar as opções de cacheBust primeiro.
-
+      // Opções focadas em ESTABILIDADE (pixelRatio 1 para evitar crash de memória)
       const options = {
-        quality: 0.95,
+        quality: 0.9,
         backgroundColor: '#0a0a0a',
-        pixelRatio: 1.5, // Reduzido levemente de 2 para 1.5 para maior estabilidade de memória
+        pixelRatio: 1, // Reduzido para 1 para garantir que funcione em qualquer dispositivo
         cacheBust: true,
         style: {
           borderRadius: '0', 
           margin: '0',
-          paddingBottom: '80px' // Aumentado para garantir que o rodapé apareça
+          paddingBottom: '100px' // Margem extra generosa contra cortes
         }
       };
 
       if (type === 'jpg') {
         const dataUrl = await htmlToImage.toJpeg(element, options);
-        if (!dataUrl) throw new Error('Falha ao gerar dados da imagem');
+        if (!dataUrl) throw new Error('O navegador não conseguiu gerar os dados da imagem.');
         
         const link = document.createElement('a');
         link.download = `FICHA-${player.nome || 'personagem'}.jpg`;
@@ -133,17 +139,16 @@ const PlayerView = () => {
         link.click();
       } else if (type === 'pdf') {
         const dataUrl = await htmlToImage.toPng(element, options);
-        if (!dataUrl) throw new Error('Falha ao gerar dados do PDF');
+        if (!dataUrl) throw new Error('O navegador não conseguiu processar o PDF.');
 
         const img = new Image();
         img.src = dataUrl;
         
         await new Promise((resolve, reject) => {
           img.onload = resolve;
-          img.onerror = () => reject(new Error('Falha ao carregar imagem para o PDF'));
+          img.onerror = () => reject(new Error('Erro ao carregar a imagem final para conversão em PDF.'));
         });
 
-        // Dimensões do PDF: Largura fixa (210mm) e altura variável conforme o conteúdo
         const pdfWidth = 210;
         const pdfHeight = (img.height * pdfWidth) / img.width;
 
@@ -157,10 +162,11 @@ const PlayerView = () => {
         pdf.save(`FICHA-${player.nome || 'personagem'}.pdf`);
       }
       
-      console.log('Exportação concluída com sucesso.');
+      console.log('Exportação v5.9 finalizada com sucesso.');
     } catch (err) {
-      console.error('Erro detalhado na exportação:', err);
-      alert(`Erro na exportaçao: ${err?.message || 'Erro desconhecido'}`);
+      console.error('ERRO CRÍTICO NA EXPORTAÇÃO:', err);
+      // Mensagem de erro mais amigável e técnica ao mesmo tempo
+      alert(`⚠️ Erro na Exportação: ${err?.message || 'Falha de Memória ou Bloqueio do Navegador'}. Tente recarregar a página e aguardar 3 segundos.`);
     } finally {
       setExporting(false);
     }
@@ -248,7 +254,7 @@ const PlayerView = () => {
                     )}
                     {player.token && (
                         <img 
-                          src={player.token} 
+                          src={tokenBase64 || player.token} 
                           alt="Token" 
                           className="w-full h-full object-cover"
                           crossOrigin="anonymous" 
