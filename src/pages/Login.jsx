@@ -19,10 +19,14 @@ const Login = () => {
     if (error) {
       alert(error.message);
     } else {
+      // Get the session to get the user ID
+      const { data: { session } } = await supabase.auth.getSession();
+      
       // Check if user is GM or Player to redirect
       const { data: userProfile } = await supabase
         .from('users')
         .select('is_gm')
+        .eq('id', session.user.id)
         .single();
       
       if (userProfile?.is_gm) {
@@ -48,7 +52,7 @@ const Login = () => {
           <div className="text-center">
             <h1 className="font-display text-4xl font-bold tracking-[0.2em] text-slate-100 uppercase mb-2">Grimório Sombrio</h1>
             <div className="h-px w-32 bg-gradient-to-r from-transparent via-slate-700 to-transparent mx-auto"></div>
-            <p className="font-serif-alt italic text-slate-500 mt-4 text-lg">Enter the dark realm</p>
+            <p className="font-serif-alt italic text-slate-500 mt-4 text-lg">Entre no reino das sombras</p>
           </div>
         </header>
 
@@ -60,12 +64,12 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-8">
             <div className="space-y-2">
-              <label className="block font-display text-xs tracking-widest text-slate-400 uppercase">Your soul's identifier</label>
+              <label className="block font-display text-xs tracking-widest text-slate-400 uppercase">Identificador da sua alma</label>
               <div className="relative group">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-slate-300 transition-colors">alternate_email</span>
                 <input 
                   className="w-full bg-black/40 border-slate-800 border-b-2 border-t-0 border-x-0 focus:ring-0 focus:border-slate-400 text-slate-200 font-body font-light pl-12 py-4 transition-all" 
-                  placeholder="Email" 
+                  placeholder="Seu Email" 
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -74,12 +78,12 @@ const Login = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="block font-display text-xs tracking-widest text-slate-400 uppercase">The secret incantation</label>
+              <label className="block font-display text-xs tracking-widest text-slate-400 uppercase">O encantamento secreto</label>
               <div className="relative group">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-slate-300 transition-colors">lock_open</span>
                 <input 
                   className="w-full bg-black/40 border-slate-800 border-b-2 border-t-0 border-x-0 focus:ring-0 focus:border-slate-400 text-slate-200 font-body font-light pl-12 py-4 transition-all" 
-                  placeholder="Password" 
+                  placeholder="Sua Senha" 
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -92,13 +96,13 @@ const Login = () => {
               type="submit"
               disabled={loading}
             >
-              {loading ? 'Entering...' : 'Enter'}
+              {loading ? 'Invocando...' : 'Entrar'}
               <span className="material-symbols-outlined text-sm">double_arrow</span>
             </button>
           </form>
           <div className="mt-8 flex justify-between items-center text-[10px] font-display uppercase tracking-widest text-slate-600">
-            <a className="hover:text-slate-400 transition-colors" href="#">Lost your way?</a>
-            <a className="hover:text-slate-400 transition-colors" href="#">Invoke new soul</a>
+            <a className="hover:text-slate-400 transition-colors" href="#">Perdeu seu caminho?</a>
+            <a className="hover:text-slate-400 transition-colors" href="#">Invocar nova alma</a>
           </div>
         </div>
       </div>
