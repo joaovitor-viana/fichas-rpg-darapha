@@ -92,7 +92,10 @@ const LandingPage = () => {
               >
                 Registrar Agora
               </button>
-              <button className="w-full sm:w-auto border border-iron hover:bg-iron/20 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest">
+              <button 
+                onClick={() => navigate('/demo')}
+                className="w-full sm:w-auto border border-iron hover:bg-iron/20 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest transition-all"
+              >
                 Ver Demonstração
               </button>
             </div>
