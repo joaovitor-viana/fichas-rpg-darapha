@@ -24,7 +24,7 @@ const JoinCampaign = () => {
       // 1. Fetch Campaign Info
       const { data: camp, error: campError } = await supabase
         .from('campaigns')
-        .select('*, users!gm_id(id)')
+        .select('*')
         .eq('id', campaignId)
         .single();
       
