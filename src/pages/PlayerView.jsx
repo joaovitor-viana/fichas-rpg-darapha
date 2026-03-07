@@ -34,8 +34,7 @@ const PlayerView = () => {
           reader.readAsDataURL(blob);
         })
         .catch(err => {
-          console.warn('Criação de Base64 para o token falhou (CORS provavelmente):', err);
-          // Fallback para a URL original se o fetch falhar
+          console.warn('Criação de Base64 para o token falhou:', err);
           setTokenBase64(player.token);
         });
     }
@@ -114,24 +113,30 @@ const PlayerView = () => {
     setExporting(true);
     try {
       const element = sheetRef.current;
-      console.log('Iniciando exportação crítica v5.9...');
-
-      // Opções focadas em ESTABILIDADE (pixelRatio 1 para evitar crash de memória)
+      
+      // CONFIGURAÇÃO PARA CONSISTÊNCIA MULTI-DISPOSITIVO (v6.0)
+      // Forçamos uma largura de Desktop (1200px) para que o layout mobile não seja exportado.
+      const exportWidth = 1200;
+      
       const options = {
-        quality: 0.9,
+        quality: 0.95,
         backgroundColor: '#0a0a0a',
-        pixelRatio: 1, // Reduzido para 1 para garantir que funcione em qualquer dispositivo
+        pixelRatio: 1.5,
+        width: exportWidth,
+        height: element.scrollHeight, // Captura a altura real total
         cacheBust: true,
         style: {
           borderRadius: '0', 
           margin: '0',
-          paddingBottom: '100px' // Margem extra generosa contra cortes
+          paddingBottom: '120px', // Rodapé generoso para evitar qualquer corte
+          minWidth: `${exportWidth}px`, // Força o layout desktop no CSS
+          width: `${exportWidth}px`
         }
       };
 
       if (type === 'jpg') {
         const dataUrl = await htmlToImage.toJpeg(element, options);
-        if (!dataUrl) throw new Error('O navegador não conseguiu gerar os dados da imagem.');
+        if (!dataUrl) throw new Error('Falha na geração da imagem.');
         
         const link = document.createElement('a');
         link.download = `FICHA-${player.nome || 'personagem'}.jpg`;
@@ -139,16 +144,13 @@ const PlayerView = () => {
         link.click();
       } else if (type === 'pdf') {
         const dataUrl = await htmlToImage.toPng(element, options);
-        if (!dataUrl) throw new Error('O navegador não conseguiu processar o PDF.');
+        if (!dataUrl) throw new Error('Falha na geração do PDF.');
 
         const img = new Image();
         img.src = dataUrl;
-        
-        await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = () => reject(new Error('Erro ao carregar a imagem final para conversão em PDF.'));
-        });
+        await new Promise(r => img.onload = r);
 
+        // PDF com altura dinâmica baseada na largura A4 (210mm)
         const pdfWidth = 210;
         const pdfHeight = (img.height * pdfWidth) / img.width;
 
@@ -161,12 +163,9 @@ const PlayerView = () => {
         pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         pdf.save(`FICHA-${player.nome || 'personagem'}.pdf`);
       }
-      
-      console.log('Exportação v5.9 finalizada com sucesso.');
     } catch (err) {
-      console.error('ERRO CRÍTICO NA EXPORTAÇÃO:', err);
-      // Mensagem de erro mais amigável e técnica ao mesmo tempo
-      alert(`⚠️ Erro na Exportação: ${err?.message || 'Falha de Memória ou Bloqueio do Navegador'}. Tente recarregar a página e aguardar 3 segundos.`);
+      console.error('Erro na exportação:', err);
+      alert(`⚠️ Erro na Exportação: ${err?.message || 'Falha de Memória'}.`);
     } finally {
       setExporting(false);
     }
