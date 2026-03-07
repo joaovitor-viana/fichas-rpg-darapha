@@ -29,6 +29,14 @@ const Register = () => {
     <div className="bg-[#0a0a0a] text-slate-100 font-display min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-6">
       <div className="fixed inset-0 spider-web-overlay pointer-events-none opacity-5"></div>
       
+      <Link 
+        to="/" 
+        className="fixed top-8 left-8 z-50 flex items-center gap-2 text-slate-600 hover:text-white transition-all group"
+      >
+        <span className="material-symbols-outlined text-2xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+        <span className="text-[10px] uppercase font-black tracking-widest">Voltar para Home</span>
+      </Link>
+
       <div className="relative w-full max-w-md z-10">
         <header className="flex flex-col items-center gap-6 mb-12">
           <div className="flex items-center justify-center size-16 border-2 border-slate-700 rounded-full bg-black shadow-xl">
