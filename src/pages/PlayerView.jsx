@@ -23,7 +23,6 @@ const PlayerView = () => {
     }
   }, [user, id]);
 
-  // Efeito para converter o token em Base64 para evitar erros de CORS na exportação
   useEffect(() => {
     if (player?.token) {
       fetch(player.token, { mode: 'cors' })
@@ -113,9 +112,6 @@ const PlayerView = () => {
     setExporting(true);
     try {
       const element = sheetRef.current;
-      
-      // CONFIGURAÇÃO PARA CONSISTÊNCIA MULTI-DISPOSITIVO (v6.0)
-      // Forçamos uma largura de Desktop (1200px) para que o layout mobile não seja exportado.
       const exportWidth = 1200;
       
       const options = {
@@ -123,13 +119,13 @@ const PlayerView = () => {
         backgroundColor: '#0a0a0a',
         pixelRatio: 1.5,
         width: exportWidth,
-        height: element.scrollHeight, // Captura a altura real total
+        height: element.scrollHeight,
         cacheBust: true,
         style: {
           borderRadius: '0', 
           margin: '0',
-          paddingBottom: '120px', // Rodapé generoso para evitar qualquer corte
-          minWidth: `${exportWidth}px`, // Força o layout desktop no CSS
+          paddingBottom: '120px',
+          minWidth: `${exportWidth}px`,
           width: `${exportWidth}px`
         }
       };
@@ -137,7 +133,6 @@ const PlayerView = () => {
       if (type === 'jpg') {
         const dataUrl = await htmlToImage.toJpeg(element, options);
         if (!dataUrl) throw new Error('Falha na geração da imagem.');
-        
         const link = document.createElement('a');
         link.download = `FICHA-${player.nome || 'personagem'}.jpg`;
         link.href = dataUrl;
@@ -145,21 +140,16 @@ const PlayerView = () => {
       } else if (type === 'pdf') {
         const dataUrl = await htmlToImage.toPng(element, options);
         if (!dataUrl) throw new Error('Falha na geração do PDF.');
-
         const img = new Image();
         img.src = dataUrl;
         await new Promise(r => img.onload = r);
-
-        // PDF com altura dinâmica baseada na largura A4 (210mm)
         const pdfWidth = 210;
         const pdfHeight = (img.height * pdfWidth) / img.width;
-
         const pdf = new jsPDF({
           orientation: 'p',
           unit: 'mm',
           format: [pdfWidth, pdfHeight]
         });
-
         pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         pdf.save(`FICHA-${player.nome || 'personagem'}.pdf`);
       }
@@ -172,34 +162,34 @@ const PlayerView = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#020202] flex flex-col items-center justify-center p-6 text-center">
-      <div className="animate-spin text-primary text-6xl mb-6">⏳</div>
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-center">
+      <div className="animate-spin text-slate-500 text-6xl mb-6">⏳</div>
       <h2 className="font-cinzel text-2xl text-slate-400 uppercase tracking-widest">Invocando Ficha...</h2>
     </div>
   );
 
   if (error || !player) return (
-    <div className="min-h-screen bg-[#020202] flex flex-col items-center justify-center p-6 text-center text-slate-100">
-      <span className="material-symbols-outlined text-primary text-6xl mb-4">skull</span>
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-center text-slate-100">
+      <span className="material-symbols-outlined text-slate-500 text-6xl mb-4">skull</span>
       <h2 className="font-cinzel text-2xl text-slate-400 uppercase tracking-widest">Erro na Invocação</h2>
-      <p className="text-slate-500 italic mt-4 max-w-md">"A alma não pôde ser lida pelo Grimório..."</p>
+      <p className="text-slate-600 italic mt-4 max-w-md">"A alma não pôde ser lida pelo Grimório..."</p>
       <div className="flex gap-4 mt-8">
-        <button onClick={fetchPlayerData} className="px-6 py-2 border border-primary/40 text-primary hover:bg-primary/20 transition-all text-xs font-bold uppercase tracking-widest">Tentar Novamente</button>
-        <Link to="/dashboard" className="px-6 py-2 border border-slate-700 text-slate-500 hover:text-slate-200 transition-all text-xs font-bold uppercase tracking-widest">Voltar</Link>
+        <button onClick={fetchPlayerData} className="px-6 py-2 border border-slate-800 text-slate-400 hover:text-white transition-all text-xs font-bold uppercase tracking-widest">Tentar Novamente</button>
+        <Link to="/dashboard" className="px-6 py-2 border border-slate-800 text-slate-600 hover:text-slate-400 transition-all text-xs font-bold uppercase tracking-widest">Voltar</Link>
       </div>
     </div>
   );
 
   return (
-    <div className="bg-[#0a0a0a] font-display text-slate-200 min-h-screen pb-20 relative overflow-hidden">
-      <div className="fixed inset-0 spider-web-overlay pointer-events-none opacity-10"></div>
+    <div className="bg-[#0a0a0a] font-display text-slate-300 min-h-screen pb-20 relative overflow-hidden">
+      <div className="fixed inset-0 spider-web-overlay pointer-events-none opacity-5"></div>
       
       <header className="flex items-center justify-between border-b border-white/5 px-6 py-4 lg:px-20 bg-black/80 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <Link to="/dashboard" className="material-symbols-outlined text-primary text-3xl">menu_book</Link>
+          <Link to="/dashboard" className="material-symbols-outlined text-slate-500 text-3xl">menu_book</Link>
           <div className="flex flex-col">
             <h1 className="font-cinzel text-xl font-bold tracking-widest uppercase text-white">Grimório Sombrio</h1>
-            <span className="text-[8px] tracking-[0.4em] text-primary/60 font-black uppercase">Interface de Edição</span>
+            <span className="text-[8px] tracking-[0.4em] text-slate-600 font-black uppercase">Ficha Monocromática</span>
           </div>
         </div>
         
@@ -208,7 +198,7 @@ const PlayerView = () => {
              <button 
               onClick={() => handleExport('jpg')} 
               disabled={exporting}
-              className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-md transition-all text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-md transition-all text-[10px] font-bold uppercase tracking-widest text-slate-500 hover:text-white"
              >
                <span className="material-symbols-outlined text-sm">image</span> {exporting ? '...' : 'JPG'}
              </button>
@@ -216,16 +206,16 @@ const PlayerView = () => {
              <button 
               onClick={() => handleExport('pdf')} 
               disabled={exporting}
-              className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-md transition-all text-[10px] font-bold uppercase tracking-widest text-red-500/80 hover:text-red-500"
+              className="flex items-center gap-2 px-4 py-2 hover:bg-white/10 rounded-md transition-all text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-white"
              >
                <span className="material-symbols-outlined text-sm">picture_as_pdf</span> {exporting ? '...' : 'PDF'}
              </button>
           </div>
 
           <Link to="/dashboard" className="flex items-center justify-center rounded-lg h-10 px-4 group hover:bg-white/5 transition-all border border-white/5">
-            <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
+            <span className="material-symbols-outlined text-slate-600 group-hover:text-white transition-colors">home</span>
           </Link>
-          <button onClick={() => supabase.auth.signOut()} className="flex items-center justify-center rounded-lg h-10 px-6 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all text-[10px] font-bold tracking-widest uppercase">
+          <button onClick={() => supabase.auth.signOut()} className="flex items-center justify-center rounded-lg h-10 px-6 bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 transition-all text-[10px] font-bold tracking-widest uppercase">
             Sair
           </button>
         </div>
@@ -234,16 +224,16 @@ const PlayerView = () => {
       <main className="max-w-6xl mx-auto w-full p-4 md:p-12 relative z-10">
         <div 
           ref={sheetRef}
-          className="bg-[#111111] border border-white/5 rounded-2xl p-8 md:p-16 flex flex-col gap-12 shadow-[0_0_80px_rgba(0,0,0,0.8)]"
+          className="bg-[#0e0e0e] border border-white/5 rounded-2xl p-8 md:p-16 flex flex-col gap-12 shadow-[0_0_80px_rgba(0,0,0,0.8)]"
         >
           
           {/* IDENTIDADE */}
-          <section className="flex flex-col lg:flex-row gap-12 items-center lg:items-end border-b border-white/10 pb-16">
+          <section className="flex flex-col lg:flex-row gap-12 items-center lg:items-end border-b border-white/5 pb-16">
             <div className="relative group shrink-0">
                <input type="file" id="token-upload" className="hidden" onChange={handleFileUpload} />
                <label htmlFor="token-upload" className="cursor-pointer block relative">
                   <div 
-                    className="size-56 rounded-full border-4 border-slate-900 bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                    className="size-56 rounded-full border-4 border border-black bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
                   >
                     {!player.token && (
                       <div className="flex flex-col items-center justify-center text-slate-800 opacity-40">
@@ -255,12 +245,12 @@ const PlayerView = () => {
                         <img 
                           src={tokenBase64 || player.token} 
                           alt="Token" 
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover grayscale opacity-80"
                           crossOrigin="anonymous" 
                         />
                     )}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 flex flex-col items-center justify-center text-white gap-2">
-                       <span className="material-symbols-outlined text-4xl text-primary">add_a_photo</span>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 flex flex-col items-center justify-center text-white gap-2">
+                       <span className="material-symbols-outlined text-4xl text-white">add_a_photo</span>
                        <span className="text-[10px] font-black uppercase tracking-widest">Trocar Token</span>
                     </div>
                   </div>
@@ -268,7 +258,7 @@ const PlayerView = () => {
             </div>
             <div className="flex flex-col text-center lg:text-left flex-1 min-w-0 w-full space-y-6">
                <div className="space-y-1">
-                 <span className="text-[10px] tracking-[0.6em] text-primary font-black uppercase ml-1 opacity-60">Codinome</span>
+                 <span className="text-[10px] tracking-[0.6em] text-slate-500 font-black uppercase ml-1 opacity-60">Codinome</span>
                  <input 
                   className="font-cinzel text-6xl md:text-7xl font-black text-white tracking-tighter bg-transparent border-none focus:ring-0 w-full text-center lg:text-left placeholder:text-slate-900 uppercase"
                   value={player.nome || ''}
@@ -278,21 +268,21 @@ const PlayerView = () => {
                </div>
                <div className="flex flex-wrap justify-center lg:justify-start gap-12">
                   <div className="flex flex-col items-center lg:items-start group">
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-1 group-hover:text-primary transition-colors">Idade</span>
-                    <input className="bg-transparent border-b border-slate-900 focus:border-primary focus:ring-0 p-1 text-white font-cinzel text-3xl w-24 text-center lg:text-left" type="number" value={player.idade || 0} onChange={(e) => handleUpdate('idade', parseInt(e.target.value))} />
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-slate-600 font-bold mb-1 group-hover:text-white transition-colors">Idade</span>
+                    <input className="bg-transparent border-b border-white/5 focus:border-white/20 focus:ring-0 p-1 text-white font-cinzel text-3xl w-24 text-center lg:text-left" type="number" value={player.idade || 0} onChange={(e) => handleUpdate('idade', parseInt(e.target.value))} />
                   </div>
                   <div className="flex flex-col items-center lg:items-start group">
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-slate-500 font-bold mb-1 group-hover:text-primary transition-colors">Sexo</span>
-                    <input className="bg-transparent border-b border-slate-900 focus:border-primary focus:ring-0 p-1 text-white font-cinzel text-3xl min-w-[320px] text-center lg:text-left uppercase" value={player.sexo || ''} onChange={(e) => handleUpdate('sexo', e.target.value)} placeholder="MASC / FEM / NB" />
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-slate-600 font-bold mb-1 group-hover:text-white transition-colors">Sexo</span>
+                    <input className="bg-transparent border-b border-white/5 focus:border-white/20 focus:ring-0 p-1 text-white font-cinzel text-3xl min-w-[320px] text-center lg:text-left uppercase" value={player.sexo || ''} onChange={(e) => handleUpdate('sexo', e.target.value)} placeholder="MASC / FEM / NB" />
                   </div>
                </div>
             </div>
           </section>
 
-          {/* STATUS */}
+          {/* STATUS - AS CORES FORAM MANTIDAS A PEDIDO DO USUÁRIO */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-20">
             <div className="space-y-10">
-              <h3 className="font-cinzel text-2xl font-bold text-white flex items-center gap-4 tracking-[0.3em] uppercase">Status Vital</h3>
+              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Status Vital</h3>
               <div className="space-y-10">
                 {[
                   { label: 'Vida', field: 'vida', color: 'bg-red-900 border-red-800' },
@@ -301,7 +291,7 @@ const PlayerView = () => {
                 ].map((stat) => (
                   <div key={stat.field} className="space-y-4">
                     <div className="flex justify-between items-end">
-                      <span className="font-cinzel text-[11px] uppercase tracking-[0.4em] text-slate-500 font-bold">{stat.label}</span>
+                      <span className="font-cinzel text-[11px] uppercase tracking-[0.4em] text-slate-600 font-bold">{stat.label}</span>
                       <input 
                         type="number"
                         className="bg-transparent border-none focus:ring-0 p-0 w-16 text-lg font-black text-white text-right"
@@ -318,10 +308,10 @@ const PlayerView = () => {
             </div>
 
             <div className="space-y-8">
-              <h3 className="font-cinzel text-2xl font-bold text-white flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
-              <div className="bg-black/40 border border-white/5 p-8 rounded-3xl min-h-[220px] flex shadow-inner group">
+              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
+              <div className="bg-black border border-white/5 p-8 rounded-3xl min-h-[220px] flex shadow-inner group">
                 <textarea 
-                  className="w-full bg-transparent border-none focus:ring-0 text-slate-400 italic text-xl leading-relaxed placeholder:text-slate-900 resize-none"
+                  className="w-full bg-transparent border-none focus:ring-0 text-slate-500 italic text-xl leading-relaxed placeholder:text-slate-900 resize-none"
                   value={player.condicoes ? player.condicoes.join('\n') : ''}
                   onChange={(e) => handleUpdate('condicoes', e.target.value.split('\n'))}
                   placeholder="Quais fardos carrega?..."
@@ -331,20 +321,20 @@ const PlayerView = () => {
           </section>
 
           {/* TRAÇOS E PSICOLOGIA */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 border-t border-white/10 pt-16">
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 border-t border-white/5 pt-16">
             <div className="space-y-8">
-              <h3 className="font-cinzel text-2xl font-bold text-white flex items-center gap-4 tracking-[0.3em] uppercase">Convicção</h3>
+              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Convicção</h3>
               <textarea 
-                className="w-full bg-black/20 border border-white/5 rounded-2xl p-8 text-slate-300 italic text-lg leading-relaxed focus:ring-1 focus:ring-primary min-h-[180px] resize-none shadow-inner"
+                className="w-full bg-black border border-white/5 rounded-2xl p-8 text-slate-400 italic text-lg leading-relaxed focus:ring-1 focus:ring-white/10 min-h-[180px] resize-none shadow-inner"
                 value={player.conviccao || ''}
                 onChange={(e) => handleUpdate('conviccao', e.target.value)}
                 placeholder="Qual o seu juramento?..."
               />
             </div>
             <div className="space-y-8">
-              <h3 className="font-cinzel text-2xl font-bold text-white flex items-center gap-4 tracking-[0.3em] uppercase">Características</h3>
+              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Características</h3>
               <textarea 
-                className="w-full bg-black/20 border border-white/5 rounded-2xl p-8 text-slate-300 text-lg leading-relaxed focus:ring-1 focus:ring-primary min-h-[180px] resize-none shadow-inner"
+                className="w-full bg-black border border-white/5 rounded-2xl p-8 text-slate-400 text-lg leading-relaxed focus:ring-1 focus:ring-white/10 min-h-[180px] resize-none shadow-inner"
                 value={player.caracteristicas || ''}
                 onChange={(e) => handleUpdate('caracteristicas', e.target.value)}
                 placeholder="Aparência, vícios e virtudes..."
@@ -353,36 +343,36 @@ const PlayerView = () => {
           </section>
 
           {/* ARSENAL E POSSES */}
-          <section className="space-y-12 border-t border-white/10 pt-16">
-            <h3 className="font-cinzel text-2xl font-bold text-white flex items-center gap-4 tracking-[0.3em] uppercase">Posses e Logística</h3>
+          <section className="space-y-12 border-t border-white/5 pt-16">
+            <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Posses e Logística</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
               <div className="space-y-10">
                 <div className="flex flex-col group">
-                  <span className="text-[10px] uppercase tracking-[0.5em] text-primary font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Arma de Combate</span>
-                  <input className="bg-black/40 border border-white/5 p-6 rounded-2xl text-white font-cinzel text-xl uppercase focus:ring-1 focus:ring-primary outline-none shadow-inner" value={player.arma_principal || ''} onChange={(e) => handleUpdate('arma_principal', e.target.value)} />
+                  <span className="text-[10px] uppercase tracking-[0.5em] text-white/40 font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Arma de Combate</span>
+                  <input className="bg-black border border-white/5 p-6 rounded-2xl text-white font-cinzel text-xl uppercase focus:ring-1 focus:ring-white/10 outline-none shadow-inner" value={player.arma_principal || ''} onChange={(e) => handleUpdate('arma_principal', e.target.value)} />
                 </div>
                 <div className="flex flex-col group">
-                  <span className="text-[10px] uppercase tracking-[0.5em] text-primary font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Transporte</span>
-                  <input className="bg-black/40 border border-white/5 p-6 rounded-2xl text-white font-cinzel text-xl uppercase focus:ring-1 focus:ring-primary outline-none shadow-inner" value={player.veiculo || ''} onChange={(e) => handleUpdate('veiculo', e.target.value)} />
+                  <span className="text-[10px] uppercase tracking-[0.5em] text-white/40 font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Transporte</span>
+                  <input className="bg-black border border-white/5 p-6 rounded-2xl text-white font-cinzel text-xl uppercase focus:ring-1 focus:ring-white/10 outline-none shadow-inner" value={player.veiculo || ''} onChange={(e) => handleUpdate('veiculo', e.target.value)} />
                 </div>
               </div>
               <div className="flex flex-col group">
-                <span className="text-[10px] uppercase tracking-[0.5em] text-primary font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Inventário Espiritual</span>
-                <textarea className="bg-black/40 border border-white/5 p-8 rounded-3xl text-slate-400 min-h-[220px] resize-none focus:ring-1 focus:ring-primary outline-none font-mono text-sm leading-loose shadow-inner" value={player.inventario?.join('\n') || ''} onChange={(e) => handleUpdate('inventario', e.target.value.split('\n'))} placeholder="Um item por linha..." />
+                <span className="text-[10px] uppercase tracking-[0.5em] text-white/40 font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Inventário Espiritual</span>
+                <textarea className="bg-black border border-white/5 p-8 rounded-3xl text-slate-500 min-h-[220px] resize-none focus:ring-1 focus:ring-white/10 outline-none font-mono text-sm leading-loose shadow-inner" value={player.inventario?.join('\n') || ''} onChange={(e) => handleUpdate('inventario', e.target.value.split('\n'))} placeholder="Um item por linha..." />
               </div>
             </div>
           </section>
 
           {/* TORMENTOS */}
-          <section className="space-y-8 border-t border-white/10 pt-16">
-            <h3 className="font-cinzel text-2xl font-bold text-red-900/80 tracking-[0.3em] uppercase">
+          <section className="space-y-8 border-t border-white/5 pt-16">
+            <h3 className="font-cinzel text-2xl font-bold text-slate-600 tracking-[0.3em] uppercase">
               Tormentos e Traumas
             </h3>
-            <textarea className="w-full bg-red-950/5 border border-red-900/10 p-10 rounded-3xl text-red-100/40 italic text-xl min-h-[140px] resize-none outline-none focus:border-red-600/30 shadow-inner" value={player.tormentos?.join('\n') || ''} onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))} placeholder="Quais cicatrizes não fecham?..." />
+            <textarea className="w-full bg-black border border-white/5 p-10 rounded-3xl text-slate-500 italic text-xl min-h-[140px] resize-none outline-none focus:border-white/10 shadow-inner" value={player.tormentos?.join('\n') || ''} onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))} placeholder="Quais cicatrizes não fecham?..." />
           </section>
 
-          {/* BOTÃO SELAR */}
-          <footer className="flex justify-center pt-12 border-t border-white/10">
+          {/* BOTÃO SELAR - MANTIDO COLORIDO A PEDIDO DO USUÁRIO */}
+          <footer className="flex justify-center pt-12 border-t border-white/5">
             <button 
               onClick={saveChanges} 
               disabled={saving} 
