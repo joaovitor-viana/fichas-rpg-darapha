@@ -13,11 +13,6 @@ const LandingPage = () => {
             <span className="material-symbols-outlined text-primary text-3xl">menu_book</span>
             <h1 className="text-xl font-bold tracking-tight text-off-white uppercase">Grimório Sombrio</h1>
           </div>
-          <nav className="hidden md:flex items-center gap-10">
-            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Funcionalidades</a>
-            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Sobre</a>
-            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Planos</a>
-          </nav>
           <div className="flex items-center gap-4">
             <button 
               onClick={() => navigate('/login')}
@@ -25,7 +20,10 @@ const LandingPage = () => {
             >
               Entrar
             </button>
-            <button className="bg-primary hover:bg-primary/90 text-off-white px-6 py-2 text-sm font-bold rounded shadow-lg shadow-primary/20 transition-all uppercase tracking-widest">
+            <button 
+              onClick={() => navigate('/register')}
+              className="bg-primary hover:bg-primary/90 text-off-white px-6 py-2 text-sm font-bold rounded shadow-lg shadow-primary/20 transition-all uppercase tracking-widest"
+            >
               Criar Conta
             </button>
           </div>
@@ -89,7 +87,7 @@ const LandingPage = () => {
             <p className="text-muted-slate">Junte-se a milhares de jogadores tecendo contos de pavor e glória.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button 
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/register')}
                 className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest shadow-lg shadow-primary/20"
               >
                 Registrar Agora
@@ -109,13 +107,8 @@ const LandingPage = () => {
             <span className="material-symbols-outlined text-primary">menu_book</span>
             <span className="text-sm font-bold text-off-white uppercase">Grimório Sombrio</span>
           </div>
-          <div className="flex gap-8">
-            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Termos de Serviço</a>
-            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacidade</a>
-            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Suporte</a>
-          </div>
           <p className="text-xs text-iron uppercase tracking-widest">
-            © 2024 Grimório Sombrio. Todos os direitos reservados.
+            © 2026 Grimório Sombrio. Todos os direitos reservados.
           </p>
         </div>
       </footer>
