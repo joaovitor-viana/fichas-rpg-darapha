@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard'
 import PlayerView from './pages/PlayerView'
 import GMView from './pages/GMView'
 import JoinCampaign from './pages/JoinCampaign'
+import Demo from './pages/Demo'
 import { useAuth } from './context/AuthContext'
 import { Navigate } from 'react-router-dom'
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/demo" element={<Demo />} />
         <Route 
           path="/dashboard" 
           element={
