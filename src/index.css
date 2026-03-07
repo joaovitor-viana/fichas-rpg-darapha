@@ -7,60 +7,62 @@
 }
 
 body {
-  @apply bg-background-light dark:bg-background-dark text-slate-900 dark:text-off-white font-display;
+  @apply bg-[#0a0a0a] text-slate-300 font-display antialiased;
 }
 
 .hero-gradient {
-  background: linear-gradient(rgba(26, 15, 12, 0.85), rgba(26, 15, 12, 0.95)), url('https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=1920');
+  background: linear-gradient(rgba(0,0,0, 0.85), rgba(0,0,0, 0.95)), url('https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=1920');
   background-size: cover;
   background-position: center;
 }
 
 .stone-texture {
-  @apply bg-[#1a1a1a] border-2 border-[#333] shadow-[inset_0_0_15px_#000,5px_5px_15px_rgba(0,0,0,0.8)];
-  background-image: linear-gradient(45deg, #111 25%, transparent 25%), linear-gradient(-45deg, #111 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #111 75%), linear-gradient(-45deg, transparent 75%, #111 75%);
+  @apply bg-[#111] border-2 border-slate-800 shadow-[inset_0_0_20px_#000,5px_5px_15px_rgba(0,0,0,0.9)];
+  background-image: 
+    linear-gradient(45deg, #0a0a0a 25%, transparent 25%), 
+    linear-gradient(-45deg, #0a0a0a 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #0a0a0a 75%), 
+    linear-gradient(-45deg, transparent 75%, #0a0a0a 75%);
   background-size: 4px 4px;
 }
 
 .rust-hover:hover {
-  background-color: #333 !important;
-  box-shadow: inset 0 0 10px #000, 0 0 5px #444;
-  color: #ccc;
+  background-color: #222 !important;
+  box-shadow: inset 0 0 10px #000, 0 0 15px rgba(255,255,255,0.05);
+  color: #fff;
+  border-color: #555;
 }
 
 .candle-glow {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 .spider-web-overlay {
   background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuB6gc5OcykddQerFMFKKX5NRHiw7fFgERQ36DvG_MgOfv00c4mBFkpx-AJz-h47St2i-6RmDhpp-2hcqT_E3uOp0CUeIGy2NeuH-Ux7etbj0g_BR8xs2fpnbQ1yISevCeF8YUY6yBwkdLzfozN3lH1S8ZW2ukrCFj2xLw6eAajijC7S2srhUl3WneFMf_y_6mVmBrYTpvSGqSUodZy4T476GY9rsvpQrFDVcmhthN_Qe-ukIBpJZZCno8lC_6YpunYeshScHmDpXLc);
   background-size: cover;
   background-position: center;
-  opacity: 0.15;
+  opacity: 0.1;
   mix-blend-mode: screen;
+  pointer-events: none;
 }
 
-/* Parchment Styles */
+/* Parchment Styles (Now Stone-like) */
 .parchment-texture {
-  background-color: #2c1e1a;
+  background-color: #0d0d0d;
   background-image: 
     url("https://www.transparenttextures.com/patterns/natural-paper.png"),
-    radial-gradient(circle at center, #3d2b24 0%, #1a120f 100%);
+    radial-gradient(circle at center, #151515 0%, #050505 100%);
   position: relative;
-  border: 1px solid #4a3429;
+  border: 1px solid #222;
 }
 
 .parchment-texture::before {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.1;
+  opacity: 0.05;
   background-image: url("https://www.transparenttextures.com/patterns/dark-matter.png");
   pointer-events: none;
-}
-
-.burnt-edge {
-  box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .wax-seal {
@@ -79,17 +81,12 @@ body {
 }
 
 .blood-texture {
-  background: linear-gradient(to bottom, rgba(40, 10, 10, 0.8), rgba(20, 5, 5, 0.9));
-  border-left: 4px solid #4a0a0a;
-}
-
-/* GM View Extras */
-.stained-glass-clip {
-  clip-path: polygon(50% 0%, 100% 20%, 85% 100%, 15% 100%, 0% 20%);
+  background: linear-gradient(to bottom, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.9));
+  border-left: 4px solid #444;
 }
 
 .spider-web-border {
-  border: 2px solid #4a3730;
+  border: 2px solid #333;
   position: relative;
 }
 
@@ -97,8 +94,8 @@ body {
   content: "";
   position: absolute;
   inset: -4px;
-  border: 1px solid #b83d14;
-  opacity: 0.3;
+  border: 1px solid #666;
+  opacity: 0.2;
   pointer-events: none;
 }
 
@@ -109,9 +106,4 @@ body {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-.scroll-input {
-  background: linear-gradient(to bottom, #3d2d28 0%, #2a1f1b 50%, #3d2d28 100%);
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
 }
