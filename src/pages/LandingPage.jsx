@@ -22,7 +22,7 @@ const LandingPage = () => {
             </button>
             <button 
               onClick={() => navigate('/register')}
-              className="bg-primary hover:bg-primary/90 text-off-white px-6 py-2 text-sm font-bold rounded shadow-lg shadow-primary/20 transition-all uppercase tracking-widest"
+              className="bg-white hover:bg-slate-200 text-black px-6 py-2 text-sm font-black rounded shadow-lg transition-all uppercase tracking-widest"
             >
               Criar Conta
             </button>
@@ -43,7 +43,7 @@ const LandingPage = () => {
             <div className="pt-6">
               <button 
                 onClick={() => navigate('/login')}
-                className="bg-primary hover:bg-primary/90 text-off-white px-10 py-5 text-lg font-bold rounded-lg shadow-2xl shadow-primary/40 transition-all uppercase tracking-[0.2em] border border-primary/50 group"
+                className="bg-white hover:bg-slate-200 text-black px-10 py-5 text-lg font-black rounded-lg shadow-2xl transition-all uppercase tracking-[0.2em] border border-white group"
               >
                 <span className="flex items-center gap-3">
                   Inicie Sua Jornada
@@ -88,7 +88,7 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button 
                 onClick={() => navigate('/register')}
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest shadow-lg shadow-primary/20"
+                className="w-full sm:w-auto bg-white hover:bg-slate-200 text-black px-12 py-4 text-md font-black rounded uppercase tracking-widest shadow-lg"
               >
                 Registrar Agora
               </button>
