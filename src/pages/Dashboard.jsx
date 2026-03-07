@@ -170,7 +170,7 @@ const Dashboard = () => {
             </h2>
             <button 
               onClick={createCharacter}
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-slate-800 text-white hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-widest"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-700 text-slate-100 hover:bg-slate-800 transition-all text-xs font-bold uppercase tracking-widest shadow-lg"
             >
               <span className="material-symbols-outlined text-sm">add</span> Nova Alma
             </button>
@@ -222,7 +222,7 @@ const Dashboard = () => {
             </h2>
             <button 
               onClick={createCampaign}
-              className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-slate-800 text-slate-400 hover:text-white hover:bg-white/10 transition-all text-xs font-bold uppercase tracking-widest"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 border border-slate-700 text-slate-100 hover:bg-slate-800 transition-all text-xs font-bold uppercase tracking-widest shadow-lg"
             >
               <span className="material-symbols-outlined text-sm">add</span> Novo Reino
             </button>
@@ -248,7 +248,7 @@ const Dashboard = () => {
                     <div className="flex gap-3">
                       <button 
                         onClick={() => navigate(`/campaign/${camp.id}`)}
-                        className="flex-1 py-3 bg-white/5 border border-slate-800 text-white text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-white/10 transition-all shadow-md"
+                        className="flex-1 py-3 bg-slate-100 text-black text-[10px] font-black tracking-[0.2em] uppercase hover:bg-white transition-all shadow-lg"
                       >
                         Gerenciar
                       </button>
