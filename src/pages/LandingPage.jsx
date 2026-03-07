@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const LandingPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -11,16 +14,19 @@ const LandingPage = () => {
             <h1 className="text-xl font-bold tracking-tight text-off-white uppercase">Grimório Sombrio</h1>
           </div>
           <nav className="hidden md:flex items-center gap-10">
-            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Features</a>
-            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">About</a>
-            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Pricing</a>
+            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Funcionalidades</a>
+            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Sobre</a>
+            <a className="text-sm font-medium text-muted-slate hover:text-primary transition-colors" href="#">Planos</a>
           </nav>
           <div className="flex items-center gap-4">
-            <button className="px-5 py-2 text-sm font-bold text-off-white hover:text-primary transition-colors border border-transparent">
-              Login
+            <button 
+              onClick={() => navigate('/login')}
+              className="px-5 py-2 text-sm font-bold text-off-white hover:text-primary transition-colors border border-transparent"
+            >
+              Entrar
             </button>
             <button className="bg-primary hover:bg-primary/90 text-off-white px-6 py-2 text-sm font-bold rounded shadow-lg shadow-primary/20 transition-all uppercase tracking-widest">
-              Sign Up
+              Criar Conta
             </button>
           </div>
         </div>
@@ -31,15 +37,18 @@ const LandingPage = () => {
         <section className="relative hero-gradient min-h-[85vh] flex items-center justify-center px-6 text-center">
           <div className="max-w-4xl mx-auto space-y-8 py-20">
             <h2 className="text-5xl md:text-7xl lg:text-8xl font-extrabold italic leading-tight text-off-white">
-              The Ancient Grimoire Awaits Your Story
+              O Antigo Grimório Aguarda Sua História
             </h2>
             <p className="text-lg md:text-xl text-muted-slate max-w-2xl mx-auto leading-relaxed">
-              The ultimate RPG organizer and VTT platform for your darkest campaigns. Manage your world, characters, and combat in one gothic interface.
+              O organizador definitivo de RPG e plataforma VTT para suas campanhas mais sombrias. Gerencie seu mundo, personagens e combates em uma interface gótica única.
             </p>
             <div className="pt-6">
-              <button className="bg-primary hover:bg-primary/90 text-off-white px-10 py-5 text-lg font-bold rounded-lg shadow-2xl shadow-primary/40 transition-all uppercase tracking-[0.2em] border border-primary/50 group">
+              <button 
+                onClick={() => navigate('/login')}
+                className="bg-primary hover:bg-primary/90 text-off-white px-10 py-5 text-lg font-bold rounded-lg shadow-2xl shadow-primary/40 transition-all uppercase tracking-[0.2em] border border-primary/50 group"
+              >
                 <span className="flex items-center gap-3">
-                  Begin Your Journey
+                  Inicie Sua Jornada
                   <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">swords</span>
                 </span>
               </button>
@@ -51,15 +60,15 @@ const LandingPage = () => {
         <section className="py-24 px-6 lg:px-20 bg-background-dark">
           <div className="max-w-7xl mx-auto">
             <div className="mb-16 space-y-4">
-              <h3 className="text-primary font-bold tracking-[0.3em] uppercase text-sm">Forged in Darkness</h3>
-              <h2 className="text-4xl font-bold text-off-white">Tools for the Master Storyteller</h2>
+              <h3 className="text-primary font-bold tracking-[0.3em] uppercase text-sm">Forjado nas Sombras</h3>
+              <h2 className="text-4xl font-bold text-off-white">Ferramentas para o Mestre Narrador</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { icon: 'castle', title: 'Campaign Management', desc: 'Organize your world\'s timeline, hidden factions, and ancient secrets in a nested digital vault.' },
-                { icon: 'person_book', title: 'Character Sheets', desc: 'Deep customization for your gothic heroes with dynamic stat tracking and inventory management.' },
-                { icon: 'skull', title: 'Combat Tracker', desc: 'Seamless initiative tracking and status effects for brutal, tactical encounters in the shadows.' },
-                { icon: 'ink_pen', title: 'Lore Compendium', desc: 'Build a comprehensive wiki of your world\'s dark history, deities, and forbidden knowledge.' }
+                { icon: 'castle', title: 'Gestão de Campanhas', desc: 'Organize a linha do tempo do seu mundo, facções ocultas e segredos antigos em um cofre digital.' },
+                { icon: 'person_book', title: 'Fichas de Personagem', desc: 'Customização profunda para seus heróis góticos com rastreamento dinâmico de status e inventário.' },
+                { icon: 'skull', title: 'Rastreador de Combate', desc: 'Controle de iniciativa e efeitos de status integrados para encontros táticos brutais nas sombras.' },
+                { icon: 'ink_pen', title: 'Compêndio de Lore', desc: 'Construa uma wiki abrangente da história sombria do seu mundo, divindades e conhecimentos proibidos.' }
               ].map((feature, idx) => (
                 <div key={idx} className="bg-vellum border border-iron p-8 rounded shadow-[0_10px_30px_rgba(0,0,0,0.5)] group hover:border-primary/50 transition-all">
                   <div className="mb-6 inline-flex items-center justify-center w-14 h-14 bg-iron/30 rounded text-primary">
@@ -76,14 +85,17 @@ const LandingPage = () => {
         {/* CTA Section */}
         <section className="py-20 bg-background-dark border-t border-iron/30">
           <div className="max-w-4xl mx-auto px-6 text-center space-y-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-off-white">Ready to open the Grimoire?</h2>
-            <p className="text-muted-slate">Join thousands of players weaving tales of dread and glory.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-off-white">Pronto para abrir o Grimório?</h2>
+            <p className="text-muted-slate">Junte-se a milhares de jogadores tecendo contos de pavor e glória.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest shadow-lg shadow-primary/20">
-                Sign Up Now
+              <button 
+                onClick={() => navigate('/login')}
+                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest shadow-lg shadow-primary/20"
+              >
+                Registrar Agora
               </button>
               <button className="w-full sm:w-auto border border-iron hover:bg-iron/20 text-off-white px-12 py-4 text-md font-bold rounded uppercase tracking-widest">
-                View Demo
+                Ver Demonstração
               </button>
             </div>
           </div>
@@ -98,12 +110,12 @@ const LandingPage = () => {
             <span className="text-sm font-bold text-off-white uppercase">Grimório Sombrio</span>
           </div>
           <div className="flex gap-8">
-            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Terms of Service</a>
-            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacy Policy</a>
-            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Support</a>
+            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Termos de Serviço</a>
+            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Privacidade</a>
+            <a className="text-xs font-medium text-muted-slate hover:text-primary transition-colors uppercase tracking-widest" href="#">Suporte</a>
           </div>
           <p className="text-xs text-iron uppercase tracking-widest">
-            © 2024 Grimório Sombrio. All rights reserved.
+            © 2024 Grimório Sombrio. Todos os direitos reservados.
           </p>
         </div>
       </footer>
