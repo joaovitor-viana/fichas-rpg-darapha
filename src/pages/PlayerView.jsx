@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from 'jspdf';
+import { useRef } from 'react';
 
 const PlayerView = () => {
   const { id } = useParams();
@@ -11,6 +11,7 @@ const PlayerView = () => {
   const [error, setError] = useState(null);
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
+  const exportRef = useRef(null);
 
   useEffect(() => {
     if (user && id) {
@@ -85,6 +86,40 @@ const PlayerView = () => {
     }
   };
 
+  const exportAsImage = async () => {
+    if (!exportRef.current) return;
+    try {
+      setLoading(true);
+      const dataUrl = await htmlToImage.toJpeg(exportRef.current, { quality: 0.95, backgroundColor: '#fff' });
+      const link = document.createElement('a');
+      link.download = `ficha-${player.nome || 'personagem'}.jpg`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      alert('Erro ao exportar imagem: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const exportAsPDF = async () => {
+    if (!exportRef.current) return;
+    try {
+      setLoading(true);
+      const dataUrl = await htmlToImage.toPng(exportRef.current);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`ficha-${player.nome || 'personagem'}.pdf`);
+    } catch (err) {
+      alert('Erro ao exportar PDF: ' + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen bg-background-dark flex flex-col items-center justify-center p-6 text-center">
       <div className="animate-spin text-primary text-6xl mb-6">⏳</div>
@@ -114,7 +149,14 @@ const PlayerView = () => {
           <Link to="/dashboard" className="material-symbols-outlined text-primary text-3xl">menu_book</Link>
           <h1 className="font-cinzel text-xl font-bold tracking-widest uppercase text-slate-100">Grimório Sombrio</h1>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-2">
+          <button onClick={exportAsImage} className="flex items-center justify-center rounded-lg h-10 px-3 bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition-all text-xs font-bold uppercase tracking-widest gap-2">
+            <span className="material-symbols-outlined text-sm">image</span> JPG
+          </button>
+          <button onClick={exportAsPDF} className="flex items-center justify-center rounded-lg h-10 px-3 bg-red-900/10 text-red-500 border border-red-900/20 hover:bg-red-900/20 transition-all text-xs font-bold uppercase tracking-widest gap-2">
+            <span className="material-symbols-outlined text-sm">picture_as_pdf</span> PDF
+          </button>
+          <div className="w-px h-10 bg-slate-800 mx-1"></div>
           <Link to="/dashboard" className="flex items-center justify-center rounded-lg h-10 px-4 group hover:bg-slate-800 transition-all">
             <span className="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">home</span>
           </Link>
@@ -318,6 +360,133 @@ const PlayerView = () => {
           </footer>
         </div>
       </main>
+
+      {/* TEMPLATE DE EXPORTAÇÃO "PROTOCOLO" (Oculto na tela) */}
+      <div className="fixed left-[-9999px] top-[-9999px]">
+        <div 
+          ref={exportRef}
+          className="w-[800px] h-[1131px] bg-white text-black p-12 relative overflow-hidden font-serif"
+          style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/natural-paper.png")' }}
+        >
+          {/* Handprints and Grunge (Mocked with SVGs/Images) */}
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/dark-matter.png")' }}></div>
+          <div className="absolute top-10 left-10 size-40 opacity-10 rotate-[-15deg]">
+            <span className="material-symbols-outlined text-9xl">back_hand</span>
+          </div>
+          <div className="absolute bottom-40 right-10 size-40 opacity-10 rotate-[20deg]">
+            <span className="material-symbols-outlined text-9xl">back_hand</span>
+          </div>
+
+          {/* Decor: Chains at corners */}
+          <div className="absolute top-0 left-0 p-4">
+            <span className="material-symbols-outlined text-5xl opacity-20">link</span>
+          </div>
+          <div className="absolute top-0 right-0 p-4">
+            <span className="material-symbols-outlined text-5xl opacity-20 rotate-90">link</span>
+          </div>
+
+          {/* Title: PROTOCOLO */}
+          <header className="text-center mb-12">
+            <h1 className="text-7xl font-bold tracking-[0.5em] uppercase mb-8 border-b-4 border-black pb-4 inline-block">PROTOCOLO</h1>
+            <div className="space-y-4 max-w-md mx-auto">
+              <div className="flex border-b border-black pb-1">
+                <span className="text-xs uppercase font-bold w-32 text-left">PLAYER</span>
+                <span className="flex-1 text-sm font-bold uppercase">{user.email?.split('@')[0]}</span>
+              </div>
+              <div className="flex border-b border-black pb-1">
+                <span className="text-xs uppercase font-bold w-32 text-left">PERSONAGEM</span>
+                <span className="flex-1 text-sm font-bold uppercase">{player.nome}</span>
+              </div>
+              <div className="flex border-b border-black pb-1">
+                <span className="text-xs uppercase font-bold w-32 text-left">IDADE</span>
+                <span className="flex-1 text-sm font-bold uppercase">{player.idade}</span>
+              </div>
+              <div className="flex border-b border-black pb-1">
+                <span className="text-xs uppercase font-bold w-32 text-left">SEXO</span>
+                <span className="flex-1 text-sm font-bold uppercase">{player.sexo}</span>
+              </div>
+            </div>
+          </header>
+
+          {/* Middle: Gauge Area */}
+          <div className="relative h-[400px] flex items-center justify-center mb-12">
+             {/* Convicção Arc at top */}
+             <div className="absolute top-0 text-center">
+                <span className="text-xs font-bold uppercase tracking-widest block mb-2">CONVICÇÃO</span>
+                <div className="w-[300px] h-4 border-2 border-black rounded-full overflow-hidden p-0.5">
+                   <div className="h-full bg-black" style={{ width: `${Math.min(100, (player.vida || 0))}%` }}></div>
+                </div>
+             </div>
+
+             <div className="flex items-center gap-20">
+                <div className="text-center">
+                  <span className="text-xs font-bold uppercase block mb-4">FOME</span>
+                  <div className="h-[200px] w-4 border-2 border-black rounded-full overflow-hidden p-0.5 flex flex-col justify-end">
+                    <div className="w-full bg-black" style={{ height: `${player.fome}%` }}></div>
+                  </div>
+                </div>
+
+                {/* Token Circle */}
+                <div className="size-56 rounded-full border-[6px] border-black flex items-center justify-center p-2 relative">
+                   <div className="absolute inset-[-12px] border-2 border-slate-300 border-dashed rounded-full animate-spin-slow"></div>
+                   <div 
+                    className="size-full rounded-full bg-cover bg-center grayscale contrast-125"
+                    style={{ backgroundImage: `url('${player.token || 'https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=400'}')` }}
+                   ></div>
+                   <div className="absolute bottom-[-20px] bg-white px-4 border-2 border-black font-bold uppercase text-xs">TOKEN</div>
+                </div>
+
+                <div className="text-center">
+                  <span className="text-xs font-bold uppercase block mb-4">SEDE</span>
+                  <div className="h-[200px] w-4 border-2 border-black rounded-full overflow-hidden p-0.5 flex flex-col justify-end">
+                    <div className="w-full bg-black" style={{ height: `${player.sede}%` }}></div>
+                  </div>
+                </div>
+             </div>
+          </div>
+
+          {/* Características Section */}
+          <div className="border-2 border-black p-6 mb-8 relative">
+            <h3 className="absolute top-[-14px] left-1/2 -translate-x-1/2 bg-white px-4 text-xs font-bold uppercase tracking-[0.3em]">CARACTERÍSTICAS</h3>
+            <p className="text-sm leading-relaxed text-justify h-[100px] overflow-hidden uppercase font-bold italic line-clamp-4">
+              {player.caracteristicas || 'Sem registros nas sombras...'}
+            </p>
+          </div>
+
+          {/* Bottom Grid: Items, Torments, etc */}
+          <div className="grid grid-cols-2 gap-8 text-[10px] font-bold uppercase">
+             <div className="space-y-4">
+                <div className="border-b border-black py-1">
+                  <span className="block mb-1 text-[8px] opacity-50">ARMA PRINCIPAL</span>
+                  {player.arma_principal || '-'}
+                </div>
+                <div className="border-b border-black py-1">
+                   <span className="block mb-1 text-[8px] opacity-50">VEÍCULO</span>
+                   {player.veiculo || '-'}
+                </div>
+             </div>
+             <div className="space-y-4">
+                <div className="border-b border-black py-1">
+                   <span className="block mb-1 text-[8px] opacity-50">CONDIÇÕES</span>
+                   <div className="flex flex-wrap gap-2">
+                    {player.condicoes?.map((c, i) => (
+                      <span key={i} className="bg-black text-white px-1">{c}</span>
+                    ))}
+                   </div>
+                </div>
+                <div className="border-b border-black py-1">
+                   <span className="block mb-1 text-[8px] opacity-50">TORMENTOS</span>
+                   {player.tormentos?.slice(0, 3).join(' • ') || '-'}
+                </div>
+             </div>
+          </div>
+
+          <footer className="absolute bottom-12 left-12 right-12 flex justify-between items-end grayscale opacity-30">
+             <div className="text-[8px] font-mono">ID: {player.id}</div>
+             <span className="material-symbols-outlined text-4xl">target</span>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 };
