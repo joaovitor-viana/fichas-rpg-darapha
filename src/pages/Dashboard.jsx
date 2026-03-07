@@ -195,9 +195,12 @@ const Dashboard = () => {
                         <p className="text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em] mt-1">{char.sexo || 'Desconhecido'} • Idade {char.idade || 0}</p>
                       </div>
                     </div>
-                    <div className="mt-6 flex gap-2">
-                       <div className="h-1 flex-1 bg-black rounded-full overflow-hidden">
+                    <div className="mt-6 flex flex-col gap-4">
+                       <div className="h-1 w-full bg-black rounded-full overflow-hidden">
                         <div className="h-full bg-slate-200" style={{ width: `${char.vida}%` }}></div>
+                      </div>
+                      <div className="py-2 bg-slate-100 text-black text-[9px] font-black text-center uppercase tracking-[0.2em] rounded border border-white group-hover:bg-white transition-all">
+                        Abrir Ficha
                       </div>
                     </div>
                   </Link>
