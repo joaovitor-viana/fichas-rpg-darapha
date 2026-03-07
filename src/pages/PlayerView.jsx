@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 const PlayerView = () => {
   const { id } = useParams();
@@ -42,9 +42,7 @@ const PlayerView = () => {
   };
 
   const saveChanges = async () => {
-    setSaving(true);
     const { id: charId, user_id, updated_at, ...updateData } = player;
-    setSaving(true);
     try {
       const { error } = await supabase
         .from('characters')
