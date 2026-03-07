@@ -375,8 +375,8 @@ const PlayerView = () => {
 
           {/* TORMENTOS */}
           <section className="space-y-8 border-t border-white/10 pt-16">
-            <h3 className="font-cinzel text-2xl font-bold text-red-900/80 flex items-center gap-4 tracking-[0.3em] uppercase">
-              <span className="material-symbols-outlined">skull</span> Tormentos e Traumas
+            <h3 className="font-cinzel text-2xl font-bold text-red-900/80 tracking-[0.3em] uppercase">
+              Tormentos e Traumas
             </h3>
             <textarea className="w-full bg-red-950/5 border border-red-900/10 p-10 rounded-3xl text-red-100/40 italic text-xl min-h-[140px] resize-none outline-none focus:border-red-600/30 shadow-inner" value={player.tormentos?.join('\n') || ''} onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))} placeholder="Quais cicatrizes não fecham?..." />
           </section>
