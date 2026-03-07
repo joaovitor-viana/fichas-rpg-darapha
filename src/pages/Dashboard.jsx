@@ -65,6 +65,24 @@ const Dashboard = () => {
     }
   };
 
+  const deleteCharacter = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm('Tem certeza que deseja banir esta alma para o abismo? Esta ação é irreversível.')) return;
+
+    try {
+      const { error } = await supabase
+        .from('characters')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setCharacters(characters.filter(c => c.id !== id));
+    } catch (error) {
+      alert('Erro ao excluir personagem: ' + error.message);
+    }
+  };
+
   const createCampaign = async () => {
     const name = prompt('Nome da Campanha:');
     if (!name) return;
@@ -84,6 +102,39 @@ const Dashboard = () => {
       fetchData(); // Refresh list
     } catch (error) {
       alert('Erro ao criar campanha: ' + error.message);
+    }
+  };
+
+  const editCampaign = async (id, currentName) => {
+    const newName = prompt('Novo nome da Campanha:', currentName);
+    if (!newName || newName === currentName) return;
+
+    try {
+      const { error } = await supabase
+        .from('campaigns')
+        .update({ nome: newName })
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchData();
+    } catch (error) {
+      alert('Erro ao editar campanha: ' + error.message);
+    }
+  };
+
+  const deleteCampaign = async (id) => {
+    if (!confirm('Deseja realmente destruir este reino? Todas as crônicas serão perdidas.')) return;
+
+    try {
+      const { error } = await supabase
+        .from('campaigns')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchData();
+    } catch (error) {
+      alert('Erro ao excluir campanha: ' + error.message);
     }
   };
 
@@ -132,24 +183,32 @@ const Dashboard = () => {
               </div>
             ) : (
               characters.map(char => (
-                <Link 
-                  key={char.id} 
-                  to={`/character/${char.id}`}
-                  className="group relative bg-black/40 border border-slate-800 p-6 rounded-lg hover:border-primary/50 transition-all hover:translate-y-[-4px]"
-                >
-                  <div className="flex items-center gap-5">
-                    <div className="size-16 rounded-full border-2 border-slate-700 bg-cover bg-center" style={{ backgroundImage: `url('${char.token || 'https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=200'}')` }}></div>
-                    <div>
-                      <h3 className="font-cinzel text-lg font-bold text-slate-200 group-hover:text-primary transition-colors uppercase tracking-tight">{char.nome}</h3>
-                      <p className="text-xs text-slate-500 italic mt-1">{char.sexo || 'Desconhecido'} • Idade {char.idade || 0}</p>
+                <div key={char.id} className="relative group">
+                  <Link 
+                    to={`/character/${char.id}`}
+                    className="block bg-black/40 border border-slate-800 p-6 rounded-lg hover:border-primary/50 transition-all hover:translate-y-[-4px]"
+                  >
+                    <div className="flex items-center gap-5">
+                      <div className="size-16 rounded-full border-2 border-slate-700 bg-cover bg-center" style={{ backgroundImage: `url('${char.token || 'https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=200'}')` }}></div>
+                      <div>
+                        <h3 className="font-cinzel text-lg font-bold text-slate-200 group-hover:text-primary transition-colors uppercase tracking-tight">{char.nome}</h3>
+                        <p className="text-xs text-slate-500 italic mt-1">{char.sexo || 'Desconhecido'} • Idade {char.idade || 0}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    <div className="h-1 flex-1 bg-slate-900 rounded-full overflow-hidden">
-                      <div className="h-full bg-primary" style={{ width: `${char.vida}%` }}></div>
+                    <div className="mt-4 flex gap-2">
+                      <div className="h-1 flex-1 bg-slate-900 rounded-full overflow-hidden">
+                        <div className="h-full bg-primary" style={{ width: `${char.vida}%` }}></div>
+                      </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                  <button 
+                    onClick={(e) => deleteCharacter(e, char.id)}
+                    className="absolute top-2 right-2 p-2 text-slate-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                    title="Excluir Personagem"
+                  >
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                  </button>
+                </div>
               ))
             )}
           </div>
@@ -185,23 +244,39 @@ const Dashboard = () => {
                   </div>
                   <h3 className="font-cinzel text-xl font-bold text-primary mb-2 uppercase tracking-widest">{camp.nome}</h3>
                   <p className="text-sm text-slate-400 font-serif-alt italic line-clamp-2 mb-6">{camp.descricao}</p>
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={() => navigate(`/campaign/${camp.id}`)}
-                      className="flex-1 py-2 bg-primary/20 border border-primary/40 text-primary text-[10px] font-bold tracking-widest uppercase hover:bg-primary/30 transition-all"
-                    >
-                      GERENCIAR
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const link = `${window.location.origin}/join/${camp.id}`;
-                        navigator.clipboard.writeText(link);
-                        alert('Link de convocação copiado para o pergaminho!');
-                      }}
-                      className="p-2 border border-slate-700 text-slate-500 hover:text-slate-200 transition-all" title="Copiar Link de Convite"
-                    >
-                      <span className="material-symbols-outlined text-lg">link</span>
-                    </button>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => navigate(`/campaign/${camp.id}`)}
+                        className="flex-1 py-2 bg-primary/20 border border-primary/40 text-primary text-[10px] font-bold tracking-widest uppercase hover:bg-primary/30 transition-all"
+                      >
+                        GERENCIAR
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const link = `${window.location.origin}/join/${camp.id}`;
+                          navigator.clipboard.writeText(link);
+                          alert('Link de convocação copiado para o pergaminho!');
+                        }}
+                        className="p-2 border border-slate-700 text-slate-500 hover:text-slate-200 transition-all" title="Copiar Link de Convite"
+                      >
+                        <span className="material-symbols-outlined text-lg">link</span>
+                      </button>
+                    </div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => editCampaign(camp.id, camp.nome)}
+                        className="flex-1 py-1 border border-slate-800 text-slate-500 text-[9px] font-bold tracking-widest uppercase hover:bg-white/5 hover:text-slate-200 transition-all"
+                      >
+                        EDITAR NOME
+                      </button>
+                      <button 
+                        onClick={() => deleteCampaign(camp.id)}
+                        className="flex-1 py-1 border border-red-900/30 text-red-900/50 text-[9px] font-bold tracking-widest uppercase hover:bg-red-900/10 hover:text-red-600 transition-all"
+                      >
+                        DESTRUIR REINO
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
