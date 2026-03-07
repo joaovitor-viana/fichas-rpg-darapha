@@ -128,7 +128,7 @@ const GMView = () => {
                     </div>
                   </div>
                   <div className="mt-auto flex gap-2">
-                    <Link to={`/character/${part.characters.id}`} className="flex-1 bg-primary text-slate-100 py-2 text-center text-sm font-bold uppercase tracking-widest rounded-sm hover:bg-primary/80 transition-all border border-primary/50">
+                    <Link to={`/character/${part.characters.id}`} className="flex-1 bg-white text-black py-3 text-center text-xs font-black uppercase tracking-[0.2em] rounded border border-white hover:bg-slate-200 transition-all shadow-xl">
                       Abrir Ficha
                     </Link>
                   </div>
