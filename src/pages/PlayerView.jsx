@@ -89,57 +89,78 @@ const PlayerView = () => {
     }
   };
 
+  // Função auxiliar para converter imagens externas em Base64 para evitar erros de CORS na exportação
+  const toDataURL = (url) => fetch(url)
+    .then(response => response.blob())
+    .then(blob => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    }));
+
   const handleExport = async (type = 'jpg') => {
     if (!sheetRef.current || exporting) return;
     
     setExporting(true);
     try {
       const element = sheetRef.current;
-      
-      // Opções para garantir alta qualidade e visual fiel
+      console.log('Iniciando exportação v5.8...');
+
+      // Preparação: Se houver token, tentamos garantir que ele está acessível
+      // O html-to-image às vezes falha com imagens externas mesmo com crossOrigin
+      // Mas para não atrasar muito, vamos tentar as opções de cacheBust primeiro.
+
       const options = {
-        quality: 1,
+        quality: 0.95,
         backgroundColor: '#0a0a0a',
-        pixelRatio: 2,
+        pixelRatio: 1.5, // Reduzido levemente de 2 para 1.5 para maior estabilidade de memória
         cacheBust: true,
         style: {
           borderRadius: '0', 
           margin: '0',
-          paddingBottom: '60px' // Margem extra para evitar corte no PDF
+          paddingBottom: '80px' // Aumentado para garantir que o rodapé apareça
         }
       };
 
       if (type === 'jpg') {
         const dataUrl = await htmlToImage.toJpeg(element, options);
+        if (!dataUrl) throw new Error('Falha ao gerar dados da imagem');
+        
         const link = document.createElement('a');
         link.download = `FICHA-${player.nome || 'personagem'}.jpg`;
         link.href = dataUrl;
         link.click();
       } else if (type === 'pdf') {
-        // Renderizar para PNG para manter transparência/qualidade
-        const dataUrl = await htmlToImage.toPng(element, { ...options, pixelRatio: 2 });
-        
-        // Criar o PDF com o exato tamanho do conteúdo
+        const dataUrl = await htmlToImage.toPng(element, options);
+        if (!dataUrl) throw new Error('Falha ao gerar dados do PDF');
+
         const img = new Image();
         img.src = dataUrl;
-        await new Promise(r => img.onload = r);
+        
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = () => reject(new Error('Falha ao carregar imagem para o PDF'));
+        });
 
-        // Calcular dimensões (conversão de pixels para mm, aprox. 1px = 0.264583mm)
-        const pdfWidth = 210; // Mantemos a largura A4 para consistência
+        // Dimensões do PDF: Largura fixa (210mm) e altura variável conforme o conteúdo
+        const pdfWidth = 210;
         const pdfHeight = (img.height * pdfWidth) / img.width;
 
         const pdf = new jsPDF({
           orientation: 'p',
           unit: 'mm',
-          format: [pdfWidth, pdfHeight] // Tamanho DINÂMICO baseado na ficha
+          format: [pdfWidth, pdfHeight]
         });
 
         pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
         pdf.save(`FICHA-${player.nome || 'personagem'}.pdf`);
       }
+      
+      console.log('Exportação concluída com sucesso.');
     } catch (err) {
-      console.error('Erro na exportação:', err);
-      alert('Erro ao gerar exportação: ' + err.message);
+      console.error('Erro detalhado na exportação:', err);
+      alert(`Erro na exportaçao: ${err?.message || 'Erro desconhecido'}`);
     } finally {
       setExporting(false);
     }
@@ -217,23 +238,23 @@ const PlayerView = () => {
                <input type="file" id="token-upload" className="hidden" onChange={handleFileUpload} />
                <label htmlFor="token-upload" className="cursor-pointer block relative">
                   <div 
-                    className="size-56 rounded-full border-4 border-slate-900 bg-cover bg-center overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
-                    style={{ backgroundImage: `url('${player.token || ''}')` }}
+                    className="size-56 rounded-full border-4 border-slate-900 bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
                   >
                     {!player.token && (
-                      <div className="flex flex-col items-center justify-center text-slate-700">
-                        <span className="material-symbols-outlined text-5xl">person</span>
+                      <div className="flex flex-col items-center justify-center text-slate-800 opacity-40">
+                        <span className="material-symbols-outlined text-7xl">person</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest mt-2">Sem Imagem</span>
                       </div>
                     )}
                     {player.token && (
                         <img 
                           src={player.token} 
                           alt="Token" 
-                          className="w-full h-full object-cover rounded-full"
+                          className="w-full h-full object-cover"
                           crossOrigin="anonymous" 
                         />
                     )}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 flex flex-col items-center justify-center text-white gap-2 rounded-full">
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/70 flex flex-col items-center justify-center text-white gap-2">
                        <span className="material-symbols-outlined text-4xl text-primary">add_a_photo</span>
                        <span className="text-[10px] font-black uppercase tracking-widest">Trocar Token</span>
                     </div>
