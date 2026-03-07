@@ -105,16 +105,6 @@ const PlayerView = () => {
 
   if (!player) return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center">
-      <div className="spider-web-overlay fixed inset-0 opacity-20"></div>
-      <span className="material-symbols-outlined text-slate-600 text-6xl mb-4">person_off</span>
-      <h2 className="font-cinzel text-2xl mb-2 text-slate-100 uppercase tracking-widest text-slate-500">Alma Desgarrada</h2>
-      <p className="text-slate-400 italic mb-6 max-w-md">Nenhuma alma vinculada foi encontrada para este usuário.</p>
-      <button 
-        onClick={() => supabase.auth.signOut()}
-        className="rust-hover px-8 py-4 bg-stone border border-slate-700 text-slate-400 font-display text-xs tracking-widest uppercase"
-      >
-        Voltar ao Portal
-      </button>
     </div>
   );
 
