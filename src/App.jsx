@@ -6,38 +6,60 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import Dashboard from './pages/Dashboard'
 import PlayerView from './pages/PlayerView'
 import GMView from './pages/GMView'
+import JoinCampaign from './pages/JoinCampaign'
+import { useAuth } from './context/AuthContext'
+import { Navigate } from 'react-router-dom'
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route 
-            path="/player" 
-            element={
-              <ProtectedRoute>
-                <PlayerView />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/gm" 
-            element={
-              <ProtectedRoute requireGm={true}>
-                <GMView />
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
-      </Router>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+        <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/character/:id" 
+          element={
+            <ProtectedRoute>
+              <PlayerView />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/campaign/:id" 
+          element={
+            <ProtectedRoute>
+              <GMView />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/join/:id" 
+          element={
+            <ProtectedRoute>
+              <JoinCampaign />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
+    </Router>
   )
 }
 
