@@ -1,7 +1,9 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/AuthContext';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
-import { useRef } from 'react';
 
 const PlayerView = () => {
   const { id } = useParams();
@@ -167,7 +169,7 @@ const PlayerView = () => {
       </header>
 
       <main className="max-w-6xl mx-auto w-full p-4 md:p-12">
-        <div className="parchment-texture burnt-edge rounded-xl p-8 md:p-12 flex flex-col gap-12 shadow-2xl relative">
+        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-8 md:p-12 flex flex-col gap-12 shadow-2xl relative">
           <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
             {/* This div is for a decorative wax seal image/SVG, if desired */}
           </div>
