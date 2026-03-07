@@ -153,7 +153,7 @@ const PlayerView = () => {
               />
               <div className="flex flex-wrap justify-center lg:justify-start gap-8">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-widest text-primary font-bold mb-1">Inviernos (Idade)</span>
+                  <span className="text-[10px] uppercase tracking-widest text-primary font-bold mb-1">Idade</span>
                   <input className="bg-transparent border-b border-slate-800 focus:border-primary focus:ring-0 p-1 text-slate-100 font-cinzel text-xl w-24" type="number" value={player.idade || 0} onChange={(e) => handleUpdate('idade', parseInt(e.target.value))} />
                 </div>
                 <div className="flex flex-col">
@@ -307,10 +307,11 @@ const PlayerView = () => {
             <button 
               onClick={saveChanges}
               disabled={saving}
-              className="stone-button group relative overflow-hidden px-16 py-6 bg-primary border-transparent text-slate-900 font-cinzel font-black text-xl tracking-[0.4em] uppercase transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+              className="wax-seal group relative flex items-center justify-center h-24 w-24 cursor-pointer border-none transition-transform active:scale-95 disabled:opacity-50"
             >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
-              {saving ? 'SELANDO...' : 'SELAR DESTINO'}
+              <span className="font-cinzel font-black text-slate-900/80 text-sm tracking-tighter -rotate-12 group-hover:scale-110 transition-transform whitespace-pre text-center">
+                {saving ? '...' : 'SELAR'}
+              </span>
             </button>
           </footer>
         </div>
