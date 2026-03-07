@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useParams, Link } from 'react-router-dom';
 
@@ -53,9 +54,7 @@ const GMView = () => {
     }
   };
 
-  const filteredPlayers = players.filter(p => 
-    p.nome?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+
 
   return (
     <div className="bg-background-dark font-display text-slate-100 min-h-screen pb-20">
