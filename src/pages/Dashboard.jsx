@@ -186,7 +186,12 @@ const Dashboard = () => {
                   <h3 className="font-cinzel text-xl font-bold text-primary mb-2 uppercase tracking-widest">{camp.nome}</h3>
                   <p className="text-sm text-slate-400 font-serif-alt italic line-clamp-2 mb-6">{camp.descricao}</p>
                   <div className="flex gap-3">
-                    <button className="flex-1 py-2 bg-primary/20 border border-primary/40 text-primary text-[10px] font-bold tracking-widest uppercase hover:bg-primary/30 transition-all">GERENCIAR</button>
+                    <button 
+                      onClick={() => navigate(`/campaign/${camp.id}`)}
+                      className="flex-1 py-2 bg-primary/20 border border-primary/40 text-primary text-[10px] font-bold tracking-widest uppercase hover:bg-primary/30 transition-all"
+                    >
+                      GERENCIAR
+                    </button>
                     <button 
                       onClick={() => {
                         const link = `${window.location.origin}/join/${camp.id}`;
