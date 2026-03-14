@@ -345,14 +345,14 @@ const PlayerView = () => {
                             <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 bg-black/50 px-4 py-2 rounded-full border border-white/5">Token</span>
                           </div>
                         )}
-                        {player.token && (
-                            <img 
-                              src={tokenBase64 || player.token} 
-                              alt="Token" 
-                              className="w-full h-full object-cover grayscale opacity-80"
-                              crossOrigin="anonymous" 
-                            />
-                        )}
+                          {player.token && (
+                              <img 
+                                src={tokenBase64 || player.token} 
+                                alt="Token" 
+                                className="w-full h-full object-cover"
+                                crossOrigin="anonymous" 
+                              />
+                          )}
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 flex flex-col items-center justify-center text-white gap-2">
                            <span className="material-symbols-outlined text-4xl text-white">add_a_photo</span>
                            <span className="text-[10px] font-black uppercase tracking-widest mt-2">Trocar Token</span>

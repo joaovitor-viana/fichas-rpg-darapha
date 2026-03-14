@@ -36,10 +36,10 @@ const Demo = () => {
           {/* Left: Persona */}
           <div className="lg:col-span-4 space-y-8">
             <div className="stone-texture p-8 rounded-2xl flex flex-col items-center gap-6 border border-slate-900 shadow-2xl relative">
-              <div className="size-48 rounded-full border-4 border-black bg-slate-900 overflow-hidden flex items-center justify-center relative shadow-[0_0_50px_rgba(0,0,0,0.8)] grayscale">
-                <img src="https://images.unsplash.com/photo-1542641728-6ca359b085f4?auto=format&fit=crop&q=80&w=400" alt="Avatar Demo" className="w-full h-full object-cover opacity-80" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
-              </div>
+              <div className="size-48 rounded-full border-4 border-black bg-slate-900 overflow-hidden flex items-center justify-center relative shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+              <span className="material-symbols-outlined text-slate-800 text-8xl opacity-20">person_filled</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            </div>
               <div className="text-center">
                 <h3 className="font-cinzel text-3xl font-bold text-white uppercase tracking-tight">Malachi Thorne</h3>
                 <p className="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mt-2">Necromante • Sombrio</p>

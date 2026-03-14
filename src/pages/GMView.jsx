@@ -104,13 +104,13 @@ const GMView = () => {
             {participants.map((part) => (
               <div key={part.id} className="relative group">
                 <div className="absolute inset-0 bg-vellum border border-primary/20 rounded-xl shadow-2xl overflow-hidden">
-                  <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGWj4UkvgbP_qGzr2-Hg6t1or_UoBUvtZTtBJN5mMRUgkIS2HiD15TwWQMFu267eVLB8zxZ4xHl5Dtc_x-kqNZtCzWSLMS8AFoeasxSvyOvf0AommgGWL9AbDknlbHRSMyP9DrNgOf2LxJr4M1ivpfsD6AgtddlUTVsl0j5B7ecFP5Af8nfjBcnA87C5CPwfGFpFamKJUuAigtUVynU56xvYnyqMavi_hwiFpxe-dutO1fhc3rnR3pZ51WzZ33nYI28JZNIkw1uRA')" }}></div>
+                  <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBGWj4UkvgbP_qGzr2-Hg6t1or_UoBUvtZTtBJN5mMRUgkIS2HiD15TwWQMFu267eVLB8zxZ4xHl5Dtc_x-kqNZtCzWSLMS8AFoeasxSvyOvf0AommgGWL9AbDknlbHRSMyP9DrNgOf2LxJr4M1ivpfsD6AgtddlUTVsl0j5B7ecFP5Af8nfjBcnA87C5CPwfGFpFamKJUuAigtUVynU56xvYnyqMavi_hwiPpxe-dutO1fhc3rnR3pZ51WzZ33nYI28JZNIkw1uRA')" }}></div>
                 </div>
                 <div className="relative p-6 flex flex-col h-full">
                   <div className="flex items-start gap-4 mb-4">
                     <div className="relative">
                       <div 
-                        className="w-16 h-16 rounded-full spider-web-border bg-cover bg-center overflow-hidden grayscale contrast-125"
+                        className="w-16 h-16 rounded-full spider-web-border bg-cover bg-center overflow-hidden"
                         style={{ backgroundImage: `url('${part.characters.token || 'https://images.unsplash.com/photo-1519074063912-ad2fe3f5198e?auto=format&fit=crop&q=80&w=200'}')` }}
                       ></div>
                     </div>
