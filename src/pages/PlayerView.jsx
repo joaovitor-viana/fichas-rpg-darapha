@@ -25,6 +25,18 @@ const AutoExpandingTextarea = ({ value, onChange, placeholder, className }) => {
 };
 
 const PlayerView = () => {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const [player, setPlayer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [tokenBase64, setTokenBase64] = useState(null);
+  const [newFeature, setNewFeature] = useState('');
+  const navigate = useNavigate();
+  const sheetRef = useRef(null);
+  const [activeStatusDropdown, setActiveStatusDropdown] = useState(null);
 
   useEffect(() => {
     if (user && id) {
