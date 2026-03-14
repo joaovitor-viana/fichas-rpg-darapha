@@ -26,7 +26,7 @@ const AutoExpandingTextarea = ({ value, onChange, placeholder, className }) => {
 
 const PlayerView = () => {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user: authUser } = useAuth();
   const [player, setPlayer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -39,10 +39,10 @@ const PlayerView = () => {
   const [activeStatusDropdown, setActiveStatusDropdown] = useState(null);
 
   useEffect(() => {
-    if (user && id) {
+    if (authUser && id) {
       fetchPlayerData();
     }
-  }, [user, id]);
+  }, [authUser, id]);
 
   useEffect(() => {
     if (player?.token) {
@@ -110,7 +110,7 @@ const PlayerView = () => {
 
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+      const fileName = `${authUser.id}-${Math.random()}.${fileExt}`;
       const filePath = `${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -384,18 +384,20 @@ const PlayerView = () => {
                 <div className="flex justify-between items-center">
                   <h3 className="font-cinzel text-xl font-bold text-slate-400 tracking-[0.3em] uppercase">Convicção</h3>
                   <div className="flex items-center gap-3">
-                    <div className="flex bg-white/5 border border-white/10 rounded-lg p-1 shadow-inner">
+                    <div className="flex bg-white/5 border border-white/10 rounded-lg p-1.5 shadow-inner">
                       <button 
                         onClick={() => handleUpdate('conviccao', Math.max(0, getNum(player.conviccao) - 1))}
-                        className="p-1 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white"
+                        className="p-2 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white flex items-center justify-center"
+                        title="Diminuir Convicção"
                       >
-                        <span className="material-symbols-outlined text-sm">arrow_downward</span>
+                        <span className="material-symbols-outlined text-base">arrow_downward</span>
                       </button>
                       <button 
                         onClick={() => handleUpdate('conviccao', Math.min(10, getNum(player.conviccao) + 1))}
-                        className="p-1 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white border-l border-white/10 ml-1 pl-2"
+                        className="p-2 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white border-l border-white/10 ml-1.5 pl-3 flex items-center justify-center"
+                        title="Aumentar Convicção"
                       >
-                        <span className="material-symbols-outlined text-sm">arrow_upward</span>
+                        <span className="material-symbols-outlined text-base">arrow_upward</span>
                       </button>
                     </div>
                     <span className="text-[10px] text-slate-600 font-bold min-w-[32px] text-right">{getNum(player.conviccao)}/10</span>
