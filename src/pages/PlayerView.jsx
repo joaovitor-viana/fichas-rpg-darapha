@@ -393,18 +393,18 @@ const PlayerView = () => {
                         <span className="material-symbols-outlined text-base">arrow_downward</span>
                       </button>
                       <button 
-                        onClick={() => handleUpdate('conviccao', Math.min(10, getNum(player.conviccao) + 1))}
+                        onClick={() => handleUpdate('conviccao', Math.min(12, getNum(player.conviccao) + 1))}
                         className="p-2 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white border-l border-white/10 ml-1.5 pl-3 flex items-center justify-center"
                         title="Aumentar Convicção"
                       >
                         <span className="material-symbols-outlined text-base">arrow_upward</span>
                       </button>
                     </div>
-                    <span className="text-[10px] text-slate-600 font-bold min-w-[32px] text-right">{getNum(player.conviccao)}/10</span>
+                    <span className="text-[10px] text-slate-600 font-bold min-w-[32px] text-right">{getNum(player.conviccao)}/12</span>
                   </div>
                 </div>
-                <div className="flex justify-start gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
-                  {[...Array(10)].map((_, i) => {
+                <div className="flex justify-start flex-wrap gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
+                  {[...Array(12)].map((_, i) => {
                     const isActive = getNum(player.conviccao) > i;
                     return (
                       <button
