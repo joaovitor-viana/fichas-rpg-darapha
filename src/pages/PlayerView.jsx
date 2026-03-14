@@ -14,6 +14,7 @@ const PlayerView = () => {
   const [saving, setSaving] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [tokenBase64, setTokenBase64] = useState(null);
+  const [newFeature, setNewFeature] = useState('');
   const navigate = useNavigate();
   const sheetRef = useRef(null);
 
@@ -161,6 +162,24 @@ const PlayerView = () => {
     }
   };
 
+  const addFeature = () => {
+    if(!newFeature.trim()) return;
+    const currentFeatures = player.caracteristicas ? player.caracteristicas.split('\n').filter(Boolean) : [];
+    handleUpdate('caracteristicas', [...currentFeatures, newFeature.trim()].join('\n'));
+    setNewFeature('');
+  };
+
+  const removeFeature = (index) => {
+    const currentFeatures = player.caracteristicas ? player.caracteristicas.split('\n').filter(Boolean) : [];
+    currentFeatures.splice(index, 1);
+    handleUpdate('caracteristicas', currentFeatures.join('\n'));
+  };
+
+  const featuresList = player?.caracteristicas ? player.caracteristicas.split('\n').filter(Boolean) : [];
+  
+  // Safe parsing for numeric values
+  const getNum = (val) => isNaN(parseInt(val)) ? 0 : parseInt(val);
+
   if (loading) return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center p-6 text-center">
       <div className="animate-spin text-slate-500 text-6xl mb-6">⏳</div>
@@ -228,151 +247,220 @@ const PlayerView = () => {
         >
           
           {/* IDENTIDADE */}
-          <section className="flex flex-col lg:flex-row gap-12 items-center lg:items-end border-b border-white/5 pb-16">
-            <div className="relative group shrink-0">
-               <input type="file" id="token-upload" className="hidden" onChange={handleFileUpload} />
-               <label htmlFor="token-upload" className="cursor-pointer block relative">
-                  <div 
-                    className="size-56 rounded-full border-4 border border-black bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
-                  >
-                    {!player.token && (
-                      <div className="flex flex-col items-center justify-center text-slate-400">
-                        <span className="material-symbols-outlined text-7xl opacity-40">person</span>
-                        <span className="text-[10px] font-bold uppercase tracking-widest mt-2 opacity-60">Sem Imagem</span>
-                      </div>
-                    )}
-                    {player.token && (
-                        <img 
-                          src={tokenBase64 || player.token} 
-                          alt="Token" 
-                          className="w-full h-full object-cover grayscale opacity-80"
-                          crossOrigin="anonymous" 
-                        />
-                    )}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 flex flex-col items-center justify-center text-white gap-2">
-                       <span className="material-symbols-outlined text-4xl text-white">add_a_photo</span>
-                       <span className="text-[10px] font-black uppercase tracking-widest">Trocar Token</span>
-                    </div>
-                  </div>
-               </label>
+          <section className="flex flex-col text-center lg:text-left min-w-0 w-full space-y-8 border-b border-white/5 pb-10">
+            <div className="space-y-1">
+              <span className="text-[10px] tracking-[0.6em] text-slate-500 font-black uppercase ml-1 opacity-60">Codinome</span>
+              <input 
+                className="font-cinzel text-6xl md:text-7xl font-black text-white tracking-tighter bg-transparent border-none focus:ring-0 w-full text-center lg:text-left placeholder:text-slate-900 uppercase"
+                value={player.nome || ''}
+                onChange={(e) => handleUpdate('nome', e.target.value)}
+                placeholder="NOME"
+              />
             </div>
-            <div className="flex flex-col text-center lg:text-left flex-1 min-w-0 w-full space-y-6">
-               <div className="space-y-1">
-                 <span className="text-[10px] tracking-[0.6em] text-slate-500 font-black uppercase ml-1 opacity-60">Codinome</span>
-                 <input 
-                  className="font-cinzel text-6xl md:text-7xl font-black text-white tracking-tighter bg-transparent border-none focus:ring-0 w-full text-center lg:text-left placeholder:text-slate-900 uppercase"
-                  value={player.nome || ''}
-                  onChange={(e) => handleUpdate('nome', e.target.value)}
-                  placeholder="NOME"
-                 />
+            <div className="flex flex-wrap justify-center lg:justify-start gap-12">
+               <div className="flex flex-col items-center lg:items-start group">
+                 <span className="text-[10px] uppercase tracking-[0.4em] text-slate-600 font-bold mb-1 group-hover:text-white transition-colors">Idade</span>
+                 <input className="bg-transparent border-b border-white/5 focus:border-white/20 focus:ring-0 p-1 text-white font-cinzel text-3xl w-24 text-center lg:text-left" type="number" value={player.idade || 0} onChange={(e) => handleUpdate('idade', parseInt(e.target.value))} />
                </div>
-               <div className="flex flex-wrap justify-center lg:justify-start gap-12">
-                  <div className="flex flex-col items-center lg:items-start group">
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-slate-600 font-bold mb-1 group-hover:text-white transition-colors">Idade</span>
-                    <input className="bg-transparent border-b border-white/5 focus:border-white/20 focus:ring-0 p-1 text-white font-cinzel text-3xl w-24 text-center lg:text-left" type="number" value={player.idade || 0} onChange={(e) => handleUpdate('idade', parseInt(e.target.value))} />
-                  </div>
-                  <div className="flex flex-col items-center lg:items-start group">
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-slate-600 font-bold mb-1 group-hover:text-white transition-colors">Sexo</span>
-                    <input className="bg-transparent border-b border-white/5 focus:border-white/20 focus:ring-0 p-1 text-white font-cinzel text-3xl min-w-[320px] text-center lg:text-left uppercase" value={player.sexo || ''} onChange={(e) => handleUpdate('sexo', e.target.value)} placeholder="MASC / FEM / NB" />
-                  </div>
+               <div className="flex flex-col items-center lg:items-start group">
+                 <span className="text-[10px] uppercase tracking-[0.4em] text-slate-600 font-bold mb-1 group-hover:text-white transition-colors">Sexo</span>
+                 <input className="bg-transparent border-b border-white/5 focus:border-white/20 focus:ring-0 p-1 text-white font-cinzel text-3xl min-w-[320px] text-center lg:text-left uppercase" value={player.sexo || ''} onChange={(e) => handleUpdate('sexo', e.target.value)} placeholder="MASC / FEM / NB" />
                </div>
             </div>
           </section>
 
-          {/* STATUS - AS CORES FORAM MANTIDAS A PEDIDO DO USUÁRIO */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-            <div className="space-y-10">
-              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Status Vital</h3>
-              <div className="space-y-10">
-                {[
-                  { label: 'Vida', field: 'vida', color: 'bg-red-900 border-red-800' },
-                  { label: 'Fome', field: 'fome', color: 'bg-orange-900 border-orange-800' },
-                  { label: 'Sede', field: 'sede', color: 'bg-blue-900 border-blue-800' }
-                ].map((stat) => (
-                  <div key={stat.field} className="space-y-4">
-                    <div className="flex justify-between items-end">
-                      <span className="font-cinzel text-[11px] uppercase tracking-[0.4em] text-slate-600 font-bold">{stat.label}</span>
-                      <input 
-                        type="number"
-                        className="bg-transparent border-none focus:ring-0 p-0 w-16 text-lg font-black text-white text-right"
-                        value={player[stat.field] || 0}
-                        onChange={(e) => handleUpdate(stat.field, parseInt(e.target.value))}
-                      />
+          {/* GRID EM 2 COLUNAS CONFORME DESIGN */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            
+            {/* COLUNA ESQUERDA */}
+            <div className="flex flex-col gap-16 w-full">
+              
+              {/* Características */}
+              <div className="space-y-6">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">
+                  Características
+                </h3>
+                <div className="flex gap-2">
+                  <input type="text"
+                    className="flex-1 bg-black border border-white/5 p-4 rounded-xl text-white outline-none focus:border-white/20"
+                    placeholder="Adicionar característica..."
+                    value={newFeature}
+                    onChange={(e) => setNewFeature(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && addFeature()}
+                  />
+                  <button onClick={addFeature} className="bg-white/5 hover:bg-white/10 border border-white/10 px-6 rounded-xl transition-all">
+                    <span className="material-symbols-outlined text-slate-300">add</span>
+                  </button>
+                </div>
+                <div className="space-y-3">
+                  {featuresList.map((feature, idx) => (
+                    <div key={idx} className="flex justify-between items-center group bg-white/5 border border-white/5 p-4 rounded-xl">
+                      <span className="text-slate-300 italic">{feature}</span>
+                      <button onClick={() => removeFeature(idx)} className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400">
+                        <span className="material-symbols-outlined text-sm">close</span>
+                      </button>
                     </div>
-                    <div className="h-4 bg-black rounded-full overflow-hidden p-[2px] border border-white/5 shadow-inner">
-                      <div className={`h-full ${stat.color} border transition-all duration-1000 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)]`} style={{ width: `${Math.min(100, Math.max(0, player[stat.field] || 0))}%` }}></div>
+                  ))}
+                  {featuresList.length === 0 && (
+                    <div className="text-center py-8 text-slate-700 italic border border-dashed border-white/10 rounded-xl">
+                      Nenhuma característica adicionada...
                     </div>
-                  </div>
-                ))}
+                  )}
+                </div>
+              </div>
+
+              {/* Token */}
+              <div className="flex justify-center pt-8">
+                <div className="relative group shrink-0">
+                   <input type="file" id="token-upload" className="hidden" onChange={handleFileUpload} />
+                   <label htmlFor="token-upload" className="cursor-pointer block relative">
+                      <div 
+                        className="w-72 h-96 rounded-2xl border-2 border-white/10 bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                      >
+                        {!player.token && (
+                          <div className="flex flex-col items-center justify-center text-slate-500">
+                            <span className="material-symbols-outlined text-6xl opacity-40 mb-4">portrait</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 bg-black/50 px-4 py-2 rounded-full border border-white/5">Token</span>
+                          </div>
+                        )}
+                        {player.token && (
+                            <img 
+                              src={tokenBase64 || player.token} 
+                              alt="Token" 
+                              className="w-full h-full object-cover grayscale opacity-80"
+                              crossOrigin="anonymous" 
+                            />
+                        )}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 flex flex-col items-center justify-center text-white gap-2">
+                           <span className="material-symbols-outlined text-4xl text-white">add_a_photo</span>
+                           <span className="text-[10px] font-black uppercase tracking-widest mt-2">Trocar Token</span>
+                        </div>
+                      </div>
+                   </label>
+                </div>
+              </div>
+
+              {/* Tormentos */}
+              <div className="space-y-6 pt-4">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">
+                  Tormentos
+                </h3>
+                <textarea 
+                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-lg leading-relaxed min-h-[160px] resize-none focus:border-white/20 outline-none shadow-inner"
+                  value={player.tormentos ? (Array.isArray(player.tormentos) ? player.tormentos.join('\n') : player.tormentos) : ''}
+                  onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))}
+                  placeholder="Quais cicatrizes não fecham?..." 
+                />
               </div>
             </div>
 
-            <div className="space-y-8">
-              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
-              <div className="bg-black border border-white/5 p-8 rounded-3xl min-h-[220px] flex shadow-inner group">
+            {/* COLUNA DIREITA */}
+            <div className="flex flex-col gap-14 w-full h-full">
+              
+              {/* Convicção */}
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-cinzel text-xl font-bold text-slate-400 tracking-[0.3em] uppercase">Convicção</h3>
+                  <span className="text-[10px] text-slate-600 font-bold">{getNum(player.conviccao)}/10</span>
+                </div>
+                <div className="flex justify-end gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
+                  {[...Array(10)].map((_, i) => i).reverse().map(value => {
+                    const isActive = getNum(player.conviccao) > value;
+                    return (
+                      <button
+                        key={value}
+                        onClick={() => handleUpdate('conviccao', value + 1)}
+                        className={`size-4 sm:size-5 rounded-full border border-white/30 transition-all shadow-inner hover:scale-125
+                          ${isActive ? 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] border-transparent' : 'bg-transparent'}
+                        `}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Vida (Estados) */}
+              <div className="space-y-6">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Vida</h3>
+                <div className="flex flex-col gap-3">
+                  {['Estável', 'Ferido', 'Debilitado', 'Morrendo'].map((estado, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => handleUpdate('vida', idx)}
+                      className={`text-left px-6 py-4 rounded-xl border transition-all uppercase tracking-widest text-[11px] font-bold ${getNum(player.vida) === idx ? 'bg-red-900/30 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'bg-black/50 border-white/5 text-slate-500 hover:border-white/20'}`}
+                    >
+                      {estado}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Fome e Sede (Lado a Lado) */}
+              <div className="grid grid-cols-2 gap-6 w-full">
+                {/* Fome */}
+                <div className="space-y-6">
+                  <h3 className="font-cinzel flex items-center gap-2 text-md font-bold text-slate-400 tracking-[0.2em] uppercase">
+                    <span>🍖</span> Fome
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {['Estável', 'Faminto', 'Debilitado', 'Inanição'].map((estado, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => handleUpdate('fome', idx)}
+                        className={`text-center px-2 py-3 rounded-lg border transition-all uppercase tracking-widest text-[9px] font-bold ${getNum(player.fome) === idx ? 'bg-orange-900/30 border-orange-500 text-white shadow-[0_0_10px_rgba(234,88,12,0.3)]' : 'bg-black/50 border-white/5 text-slate-500 hover:border-white/20'}`}
+                      >
+                        {estado}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sede */}
+                <div className="space-y-6">
+                  <h3 className="font-cinzel flex items-center gap-2 text-md font-bold text-slate-400 tracking-[0.2em] uppercase">
+                    <span>💧</span> Sede
+                  </h3>
+                  <div className="flex flex-col gap-3">
+                    {['Estável', 'Sedento', 'Desidratado', 'Colapso'].map((estado, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => handleUpdate('sede', idx)}
+                        className={`text-center px-2 py-3 rounded-lg border transition-all uppercase tracking-widest text-[9px] font-bold ${getNum(player.sede) === idx ? 'bg-blue-900/30 border-blue-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.3)]' : 'bg-black/50 border-white/5 text-slate-500 hover:border-white/20'}`}
+                      >
+                        {estado}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Inventário */}
+              <div className="space-y-6 w-full pt-4">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 tracking-[0.3em] uppercase">Inventário</h3>
                 <textarea 
-                  className="w-full bg-transparent border-none focus:ring-0 text-slate-500 italic text-xl leading-relaxed placeholder:text-slate-900 resize-none"
-                  value={player.condicoes ? player.condicoes.join('\n') : ''}
+                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 min-h-[220px] resize-none focus:border-white/20 outline-none font-mono text-sm leading-loose shadow-inner" 
+                  value={player.inventario ? (Array.isArray(player.inventario) ? player.inventario.join('\n') : player.inventario) : ''} 
+                  onChange={(e) => handleUpdate('inventario', e.target.value.split('\n'))} 
+                  placeholder="Um item por linha..." 
+                />
+              </div>
+
+              {/* Condições */}
+              <div className="space-y-6 flex-1 flex flex-col justify-end pt-4">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
+                <textarea 
+                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-lg leading-relaxed placeholder:text-slate-800 resize-none min-h-[140px] focus:border-white/20 outline-none shadow-inner"
+                  value={player.condicoes ? (Array.isArray(player.condicoes) ? player.condicoes.join('\n') : player.condicoes) : ''}
                   onChange={(e) => handleUpdate('condicoes', e.target.value.split('\n'))}
                   placeholder="Quais fardos carrega?..."
                 />
               </div>
-            </div>
-          </section>
 
-          {/* TRAÇOS E PSICOLOGIA */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-20 border-t border-white/5 pt-16">
-            <div className="space-y-8">
-              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Convicção</h3>
-              <textarea 
-                className="w-full bg-black border border-white/5 rounded-2xl p-8 text-slate-400 italic text-lg leading-relaxed focus:ring-1 focus:ring-white/10 min-h-[180px] resize-none shadow-inner"
-                value={player.conviccao || ''}
-                onChange={(e) => handleUpdate('conviccao', e.target.value)}
-                placeholder="Qual o seu juramento?..."
-              />
             </div>
-            <div className="space-y-8">
-              <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Características</h3>
-              <textarea 
-                className="w-full bg-black border border-white/5 rounded-2xl p-8 text-slate-400 text-lg leading-relaxed focus:ring-1 focus:ring-white/10 min-h-[180px] resize-none shadow-inner"
-                value={player.caracteristicas || ''}
-                onChange={(e) => handleUpdate('caracteristicas', e.target.value)}
-                placeholder="Aparência, vícios e virtudes..."
-              />
-            </div>
-          </section>
+          </div>
 
-          {/* ARSENAL E POSSES */}
-          <section className="space-y-12 border-t border-white/5 pt-16">
-            <h3 className="font-cinzel text-2xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Posses e Logística</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-              <div className="space-y-10">
-                <div className="flex flex-col group">
-                  <span className="text-[10px] uppercase tracking-[0.5em] text-white/40 font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Arma de Combate</span>
-                  <input className="bg-black border border-white/5 p-6 rounded-2xl text-white font-cinzel text-xl uppercase focus:ring-1 focus:ring-white/10 outline-none shadow-inner" value={player.arma_principal || ''} onChange={(e) => handleUpdate('arma_principal', e.target.value)} />
-                </div>
-                <div className="flex flex-col group">
-                  <span className="text-[10px] uppercase tracking-[0.5em] text-white/40 font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Transporte</span>
-                  <input className="bg-black border border-white/5 p-6 rounded-2xl text-white font-cinzel text-xl uppercase focus:ring-1 focus:ring-white/10 outline-none shadow-inner" value={player.veiculo || ''} onChange={(e) => handleUpdate('veiculo', e.target.value)} />
-                </div>
-              </div>
-              <div className="flex flex-col group">
-                <span className="text-[10px] uppercase tracking-[0.5em] text-white/40 font-black mb-3 ml-2 group-hover:opacity-100 opacity-60 transition-opacity">Inventário Espiritual</span>
-                <textarea className="bg-black border border-white/5 p-8 rounded-3xl text-slate-500 min-h-[220px] resize-none focus:ring-1 focus:ring-white/10 outline-none font-mono text-sm leading-loose shadow-inner" value={player.inventario?.join('\n') || ''} onChange={(e) => handleUpdate('inventario', e.target.value.split('\n'))} placeholder="Um item por linha..." />
-              </div>
-            </div>
-          </section>
-
-          {/* TORMENTOS */}
-          <section className="space-y-8 border-t border-white/5 pt-16">
-            <h3 className="font-cinzel text-2xl font-bold text-slate-600 tracking-[0.3em] uppercase">
-              Tormentos e Traumas
-            </h3>
-            <textarea className="w-full bg-black border border-white/5 p-10 rounded-3xl text-slate-500 italic text-xl min-h-[140px] resize-none outline-none focus:border-white/10 shadow-inner" value={player.tormentos?.join('\n') || ''} onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))} placeholder="Quais cicatrizes não fecham?..." />
-          </section>
-
-          {/* BOTÃO SELAR - MANTIDO COLORIDO A PEDIDO DO USUÁRIO */}
-          <footer className="flex justify-center pt-12 border-t border-white/5">
+          {/* BOTÃO SELAR */}
+          <footer className="flex justify-center pt-16 border-t border-white/5 mt-8">
             <button 
               onClick={saveChanges} 
               disabled={saving} 
