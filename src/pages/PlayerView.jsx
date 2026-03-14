@@ -65,12 +65,14 @@ const PlayerView = () => {
 
   const saveChanges = async () => {
     if (!player) return;
-    const { id: charId, user_id, updated_at, ...updateData } = player;
+    const { id: charId, user_id, updated_at, caracteristicas, ...updateData } = player;
+    // Ensure caracteristicas is included if it exists in the player object
+    const finalUpdateData = { ...updateData, caracteristicas: player.caracteristicas };
     setSaving(true);
     try {
       const { error } = await supabase
         .from('characters')
-        .update(updateData)
+        .update(finalUpdateData)
         .eq('id', id);
 
       if (error) throw error;
@@ -340,17 +342,28 @@ const PlayerView = () => {
                 </div>
               </div>
 
-              {/* Tormentos */}
-              <div className="space-y-6 pt-4">
-                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">
-                  Tormentos
-                </h3>
-                <textarea 
-                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-lg leading-relaxed min-h-[160px] resize-none focus:border-white/20 outline-none shadow-inner"
-                  value={player.tormentos ? (Array.isArray(player.tormentos) ? player.tormentos.join('\n') : player.tormentos) : ''}
-                  onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))}
-                  placeholder="Quais cicatrizes não fecham?..." 
-                />
+              {/* Tormentos e Condições */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
+                <div className="space-y-6">
+                  <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">
+                    Tormentos
+                  </h3>
+                  <textarea 
+                    className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-sm leading-relaxed min-h-[160px] resize-none focus:border-white/20 outline-none shadow-inner"
+                    value={player.tormentos ? (Array.isArray(player.tormentos) ? player.tormentos.join('\n') : player.tormentos) : ''}
+                    onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))}
+                    placeholder="Quais cicatrizes não fecham?..." 
+                  />
+                </div>
+                <div className="space-y-6">
+                  <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
+                  <textarea 
+                    className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-sm leading-relaxed placeholder:text-slate-800 resize-none min-h-[160px] focus:border-white/20 outline-none shadow-inner"
+                    value={player.condicoes ? (Array.isArray(player.condicoes) ? player.condicoes.join('\n') : player.condicoes) : ''}
+                    onChange={(e) => handleUpdate('condicoes', e.target.value.split('\n'))}
+                    placeholder="Quais fardos carrega?..."
+                  />
+                </div>
               </div>
             </div>
 
@@ -363,13 +376,13 @@ const PlayerView = () => {
                   <h3 className="font-cinzel text-xl font-bold text-slate-400 tracking-[0.3em] uppercase">Convicção</h3>
                   <span className="text-[10px] text-slate-600 font-bold">{getNum(player.conviccao)}/10</span>
                 </div>
-                <div className="flex justify-end gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
-                  {[...Array(10)].map((_, i) => i).reverse().map(value => {
-                    const isActive = getNum(player.conviccao) > value;
+                <div className="flex justify-start gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
+                  {[...Array(10)].map((_, i) => {
+                    const isActive = getNum(player.conviccao) > i;
                     return (
                       <button
-                        key={value}
-                        onClick={() => handleUpdate('conviccao', value + 1)}
+                        key={i}
+                        onClick={() => handleUpdate('conviccao', i + 1)}
                         className={`size-4 sm:size-5 rounded-full border border-white/30 transition-all shadow-inner hover:scale-125
                           ${isActive ? 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] border-transparent' : 'bg-transparent'}
                         `}
@@ -379,57 +392,67 @@ const PlayerView = () => {
                 </div>
               </div>
 
-              {/* Vida (Estados) */}
-              <div className="space-y-6">
-                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Vida</h3>
-                <div className="flex flex-col gap-3">
-                  {['Estável', 'Ferido', 'Debilitado', 'Morrendo'].map((estado, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => handleUpdate('vida', idx)}
-                      className={`text-left px-6 py-4 rounded-xl border transition-all uppercase tracking-widest text-[11px] font-bold ${getNum(player.vida) === idx ? 'bg-red-900/30 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]' : 'bg-black/50 border-white/5 text-slate-500 hover:border-white/20'}`}
-                    >
-                      {estado}
-                    </button>
-                  ))}
+              {/* Vida, Fome e Sede (Interactive Selectors) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Vida */}
+                <div className="space-y-4">
+                  <h3 className="font-cinzel text-sm font-bold text-slate-400 tracking-[0.2em] uppercase text-center md:text-left">Vida</h3>
+                  <div className="relative group/status">
+                    <div className={`text-center px-4 py-3 rounded-xl border transition-all uppercase tracking-widest text-[11px] font-bold cursor-pointer
+                      ${getNum(player.vida) === 0 ? 'bg-green-900/20 border-green-500/50 text-green-400' : 
+                        getNum(player.vida) === 1 ? 'bg-yellow-900/20 border-yellow-500/50 text-yellow-400' :
+                        getNum(player.vida) === 2 ? 'bg-orange-900/20 border-orange-500/50 text-orange-400' :
+                        'bg-red-900/30 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]'}
+                    `}>
+                      {['Estável', 'Ferido', 'Debilitado', 'Morrendo'][getNum(player.vida)]}
+                    </div>
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0e0e0e] border border-white/10 rounded-xl overflow-hidden hidden group-hover/status:flex flex-col z-20 shadow-2xl">
+                      {['Estável', 'Ferido', 'Debilitado', 'Morrendo'].map((estado, idx) => (
+                        <button key={idx} onClick={() => handleUpdate('vida', idx)} className="px-4 py-3 text-[10px] uppercase font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors text-left border-b border-white/5 last:border-none">
+                          {estado}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              {/* Fome e Sede (Lado a Lado) */}
-              <div className="grid grid-cols-2 gap-6 w-full">
                 {/* Fome */}
-                <div className="space-y-6">
-                  <h3 className="font-cinzel flex items-center gap-2 text-md font-bold text-slate-400 tracking-[0.2em] uppercase">
-                    <span>🍖</span> Fome
-                  </h3>
-                  <div className="flex flex-col gap-3">
-                    {['Estável', 'Faminto', 'Debilitado', 'Inanição'].map((estado, idx) => (
-                      <button 
-                        key={idx}
-                        onClick={() => handleUpdate('fome', idx)}
-                        className={`text-center px-2 py-3 rounded-lg border transition-all uppercase tracking-widest text-[9px] font-bold ${getNum(player.fome) === idx ? 'bg-orange-900/30 border-orange-500 text-white shadow-[0_0_10px_rgba(234,88,12,0.3)]' : 'bg-black/50 border-white/5 text-slate-500 hover:border-white/20'}`}
-                      >
-                        {estado}
-                      </button>
-                    ))}
+                <div className="space-y-4">
+                  <h3 className="font-cinzel text-sm font-bold text-slate-400 tracking-[0.2em] uppercase text-center md:text-left">Fome</h3>
+                  <div className="relative group/status">
+                    <div className={`text-center px-4 py-3 rounded-xl border transition-all uppercase tracking-widest text-[11px] font-bold cursor-pointer
+                      ${getNum(player.fome) === 0 ? 'bg-green-900/20 border-green-500/50 text-green-400' : 
+                        'bg-orange-900/30 border-orange-500 text-white shadow-[0_0_10px_rgba(234,88,12,0.3)]'}
+                    `}>
+                      {['Estável', 'Faminto', 'Debilitado', 'Inanição'][getNum(player.fome)]}
+                    </div>
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0e0e0e] border border-white/10 rounded-xl overflow-hidden hidden group-hover/status:flex flex-col z-20 shadow-2xl">
+                      {['Estável', 'Faminto', 'Debilitado', 'Inanição'].map((estado, idx) => (
+                        <button key={idx} onClick={() => handleUpdate('fome', idx)} className="px-4 py-3 text-[10px] uppercase font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors text-left border-b border-white/5 last:border-none">
+                          {estado}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 {/* Sede */}
-                <div className="space-y-6">
-                  <h3 className="font-cinzel flex items-center gap-2 text-md font-bold text-slate-400 tracking-[0.2em] uppercase">
-                    <span>💧</span> Sede
-                  </h3>
-                  <div className="flex flex-col gap-3">
-                    {['Estável', 'Sedento', 'Desidratado', 'Colapso'].map((estado, idx) => (
-                      <button 
-                        key={idx}
-                        onClick={() => handleUpdate('sede', idx)}
-                        className={`text-center px-2 py-3 rounded-lg border transition-all uppercase tracking-widest text-[9px] font-bold ${getNum(player.sede) === idx ? 'bg-blue-900/30 border-blue-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.3)]' : 'bg-black/50 border-white/5 text-slate-500 hover:border-white/20'}`}
-                      >
-                        {estado}
-                      </button>
-                    ))}
+                <div className="space-y-4">
+                  <h3 className="font-cinzel text-sm font-bold text-slate-400 tracking-[0.2em] uppercase text-center md:text-left">Sede</h3>
+                  <div className="relative group/status">
+                    <div className={`text-center px-4 py-3 rounded-xl border transition-all uppercase tracking-widest text-[11px] font-bold cursor-pointer
+                      ${getNum(player.sede) === 0 ? 'bg-green-900/20 border-green-500/50 text-green-400' : 
+                        'bg-blue-900/30 border-blue-500 text-white shadow-[0_0_10px_rgba(59,130,246,0.3)]'}
+                    `}>
+                      {['Estável', 'Sedento', 'Desidratado', 'Colapso'][getNum(player.sede)]}
+                    </div>
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-[#0e0e0e] border border-white/10 rounded-xl overflow-hidden hidden group-hover/status:flex flex-col z-20 shadow-2xl">
+                      {['Estável', 'Sedento', 'Desidratado', 'Colapso'].map((estado, idx) => (
+                        <button key={idx} onClick={() => handleUpdate('sede', idx)} className="px-4 py-3 text-[10px] uppercase font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors text-left border-b border-white/5 last:border-none">
+                          {estado}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -445,16 +468,6 @@ const PlayerView = () => {
                 />
               </div>
 
-              {/* Condições */}
-              <div className="space-y-6 flex-1 flex flex-col justify-end pt-4">
-                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
-                <textarea 
-                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-lg leading-relaxed placeholder:text-slate-800 resize-none min-h-[140px] focus:border-white/20 outline-none shadow-inner"
-                  value={player.condicoes ? (Array.isArray(player.condicoes) ? player.condicoes.join('\n') : player.condicoes) : ''}
-                  onChange={(e) => handleUpdate('condicoes', e.target.value.split('\n'))}
-                  placeholder="Quais fardos carrega?..."
-                />
-              </div>
 
             </div>
           </div>
