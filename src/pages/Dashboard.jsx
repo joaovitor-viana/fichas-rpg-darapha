@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.png';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -149,7 +150,7 @@ const Dashboard = () => {
       <header className="border-b border-white/5 px-6 py-6 lg:px-20 bg-black/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <img src="/src/assets/logo.png" alt="Protocolo" className="h-12 w-auto object-contain" />
+            <img src={logo} alt="Protocolo" className="h-12 w-auto object-contain" />
           </div>
           <button 
             onClick={() => supabase.auth.signOut()}
