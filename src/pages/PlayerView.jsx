@@ -5,38 +5,26 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 
-const PlayerView = () => {
-  const { id } = useParams();
-  const { user } = useAuth();
-  const [player, setPlayer] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const [tokenBase64, setTokenBase64] = useState(null);
-  const [newFeature, setNewFeature] = useState('');
-  const navigate = useNavigate();
-  const sheetRef = useRef(null);
-  const [activeStatusDropdown, setActiveStatusDropdown] = useState(null);
+const AutoExpandingTextarea = ({ value, onChange, placeholder, className }) => {
+  const textareaRef = useRef(null);
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [value]);
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className={`${className} overflow-hidden resize-none transition-[height] duration-200`}
+    />
+  );
+};
 
-  const AutoExpandingTextarea = ({ value, onChange, placeholder, className }) => {
-    const textareaRef = useRef(null);
-    useEffect(() => {
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto';
-        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-      }
-    }, [value]);
-    return (
-      <textarea
-        ref={textareaRef}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={`${className} overflow-hidden resize-none transition-[height] duration-200`}
-      />
-    );
-  };
+const PlayerView = () => {
 
   useEffect(() => {
     if (user && id) {
@@ -294,7 +282,7 @@ const PlayerView = () => {
           {/* GRID EM 2 COLUNAS REBALANCEADO */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
             
-            {/* COLUNA ESQUERDA: Características, Convicção e Status */}
+            {/* COLUNA ESQUERDA: Características -> Token -> Tormentos */}
             <div className="flex flex-col gap-16 w-full">
               
               {/* Características */}
@@ -331,6 +319,54 @@ const PlayerView = () => {
                 </div>
               </div>
 
+              {/* Token */}
+              <div className="flex justify-center">
+                <div className="relative group shrink-0">
+                   <input type="file" id="token-upload" className="hidden" onChange={handleFileUpload} />
+                   <label htmlFor="token-upload" className="cursor-pointer block relative">
+                      <div 
+                        className="w-72 h-96 rounded-2xl border-2 border-white/10 bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
+                      >
+                        {!player.token && (
+                          <div className="flex flex-col items-center justify-center text-slate-500">
+                            <span className="material-symbols-outlined text-6xl opacity-40 mb-4">portrait</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 bg-black/50 px-4 py-2 rounded-full border border-white/5">Token</span>
+                          </div>
+                        )}
+                        {player.token && (
+                            <img 
+                              src={tokenBase64 || player.token} 
+                              alt="Token" 
+                              className="w-full h-full object-cover grayscale opacity-80"
+                              crossOrigin="anonymous" 
+                            />
+                        )}
+                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 flex flex-col items-center justify-center text-white gap-2">
+                           <span className="material-symbols-outlined text-4xl text-white">add_a_photo</span>
+                           <span className="text-[10px] font-black uppercase tracking-widest mt-2">Trocar Token</span>
+                        </div>
+                      </div>
+                   </label>
+                </div>
+              </div>
+
+              {/* Tormentos */}
+              <div className="space-y-6">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">
+                  Tormentos
+                </h3>
+                <AutoExpandingTextarea 
+                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-sm leading-relaxed min-h-[120px] outline-none shadow-inner"
+                  value={player.tormentos ? (Array.isArray(player.tormentos) ? player.tormentos.join('\n') : player.tormentos) : ''}
+                  onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))}
+                  placeholder="Quais cicatrizes não fecham?..." 
+                />
+              </div>
+            </div>
+
+            {/* COLUNA DIREITA: Convicção -> Vida/Fome/Sede -> Inventário -> Condições */}
+            <div className="flex flex-col gap-14 w-full h-full">
+              
               {/* Convicção */}
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -427,43 +463,8 @@ const PlayerView = () => {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* COLUNA DIREITA: Token e Campos de Texto Dinâmicos */}
-            <div className="flex flex-col gap-14 w-full h-full">
-              
-              {/* Token */}
-              <div className="flex justify-center">
-                <div className="relative group shrink-0">
-                   <input type="file" id="token-upload" className="hidden" onChange={handleFileUpload} />
-                   <label htmlFor="token-upload" className="cursor-pointer block relative">
-                      <div 
-                        className="w-72 h-96 rounded-2xl border-2 border-white/10 bg-[#050505] overflow-hidden flex items-center justify-center relative transition-all duration-500 hover:scale-[1.02] shadow-[0_0_40px_rgba(0,0,0,0.5)]"
-                      >
-                        {!player.token && (
-                          <div className="flex flex-col items-center justify-center text-slate-500">
-                            <span className="material-symbols-outlined text-6xl opacity-40 mb-4">portrait</span>
-                            <span className="text-[10px] font-bold uppercase tracking-widest opacity-60 bg-black/50 px-4 py-2 rounded-full border border-white/5">Token</span>
-                          </div>
-                        )}
-                        {player.token && (
-                            <img 
-                              src={tokenBase64 || player.token} 
-                              alt="Token" 
-                              className="w-full h-full object-cover grayscale opacity-80"
-                              crossOrigin="anonymous" 
-                            />
-                        )}
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-black/80 flex flex-col items-center justify-center text-white gap-2">
-                           <span className="material-symbols-outlined text-4xl text-white">add_a_photo</span>
-                           <span className="text-[10px] font-black uppercase tracking-widest mt-2">Trocar Token</span>
-                        </div>
-                      </div>
-                   </label>
-                </div>
-              </div>
-
-              {/* Inventário (Move to right column to fill space) */}
+              {/* Inventário */}
               <div className="space-y-6 w-full pt-4">
                 <h3 className="font-cinzel text-xl font-bold text-slate-400 tracking-[0.3em] uppercase">Inventário</h3>
                 <AutoExpandingTextarea 
@@ -474,28 +475,15 @@ const PlayerView = () => {
                 />
               </div>
 
-              {/* Tormentos e Condições (Dynamically expanding) */}
-              <div className="flex flex-col gap-12 pt-4">
-                <div className="space-y-6">
-                  <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">
-                    Tormentos
-                  </h3>
-                  <AutoExpandingTextarea 
-                    className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-sm leading-relaxed min-h-[120px] outline-none shadow-inner"
-                    value={player.tormentos ? (Array.isArray(player.tormentos) ? player.tormentos.join('\n') : player.tormentos) : ''}
-                    onChange={(e) => handleUpdate('tormentos', e.target.value.split('\n'))}
-                    placeholder="Quais cicatrizes não fecham?..." 
-                  />
-                </div>
-                <div className="space-y-6">
-                  <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
-                  <AutoExpandingTextarea 
-                    className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-sm leading-relaxed placeholder:text-slate-800 min-h-[120px] outline-none shadow-inner"
-                    value={player.condicoes ? (Array.isArray(player.condicoes) ? player.condicoes.join('\n') : player.condicoes) : ''}
-                    onChange={(e) => handleUpdate('condicoes', e.target.value.split('\n'))}
-                    placeholder="Quais fardos carrega?..."
-                  />
-                </div>
+              {/* Condições */}
+              <div className="space-y-6 pt-4">
+                <h3 className="font-cinzel text-xl font-bold text-slate-400 flex items-center gap-4 tracking-[0.3em] uppercase">Condições</h3>
+                <AutoExpandingTextarea 
+                  className="w-full bg-black border border-white/5 p-8 rounded-3xl text-slate-400 italic text-sm leading-relaxed placeholder:text-slate-800 min-h-[120px] outline-none shadow-inner"
+                  value={player.condicoes ? (Array.isArray(player.condicoes) ? player.condicoes.join('\n') : player.condicoes) : ''}
+                  onChange={(e) => handleUpdate('condicoes', e.target.value.split('\n'))}
+                  placeholder="Quais fardos carrega?..."
+                />
               </div>
             </div>
           </div>
