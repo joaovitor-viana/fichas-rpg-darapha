@@ -403,14 +403,14 @@ const PlayerView = () => {
                     <span className="text-[10px] text-slate-600 font-bold min-w-[32px] text-right">{getNum(player.conviccao)}/12</span>
                   </div>
                 </div>
-                <div className="flex justify-start flex-wrap gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
+                <div className="flex justify-center items-center gap-2 bg-black/50 p-6 rounded-2xl border border-white/5 overflow-x-auto no-scrollbar">
                   {[...Array(12)].map((_, i) => {
                     const isActive = getNum(player.conviccao) > i;
                     return (
                       <button
                         key={i}
                         onClick={() => handleUpdate('conviccao', i + 1)}
-                        className={`size-4 sm:size-5 rounded-full border border-white/30 transition-all shadow-inner hover:scale-125
+                        className={`size-3 sm:size-4 flex-shrink-0 rounded-full border border-white/30 transition-all shadow-inner hover:scale-125
                           ${isActive ? 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] border-transparent' : 'bg-transparent'}
                         `}
                       />

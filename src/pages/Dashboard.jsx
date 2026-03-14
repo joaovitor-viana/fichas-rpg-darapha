@@ -149,8 +149,7 @@ const Dashboard = () => {
       <header className="border-b border-white/5 px-6 py-6 lg:px-20 bg-black/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="material-symbols-outlined text-slate-400 text-4xl">dashboard_customize</span>
-            <h1 className="font-cinzel text-2xl font-bold tracking-widest text-slate-100 uppercase">Portal das Sombras</h1>
+            <img src="/src/assets/logo.png" alt="Protocolo" className="h-12 w-auto object-contain" />
           </div>
           <button 
             onClick={() => supabase.auth.signOut()}
