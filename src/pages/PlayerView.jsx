@@ -383,7 +383,23 @@ const PlayerView = () => {
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h3 className="font-cinzel text-xl font-bold text-slate-400 tracking-[0.3em] uppercase">Convicção</h3>
-                  <span className="text-[10px] text-slate-600 font-bold">{getNum(player.conviccao)}/10</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex bg-white/5 border border-white/10 rounded-lg p-1 shadow-inner">
+                      <button 
+                        onClick={() => handleUpdate('conviccao', Math.max(0, getNum(player.conviccao) - 1))}
+                        className="p-1 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white"
+                      >
+                        <span className="material-symbols-outlined text-sm">arrow_downward</span>
+                      </button>
+                      <button 
+                        onClick={() => handleUpdate('conviccao', Math.min(10, getNum(player.conviccao) + 1))}
+                        className="p-1 hover:bg-white/10 rounded-md transition-all text-slate-500 hover:text-white border-l border-white/10 ml-1 pl-2"
+                      >
+                        <span className="material-symbols-outlined text-sm">arrow_upward</span>
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-slate-600 font-bold min-w-[32px] text-right">{getNum(player.conviccao)}/10</span>
+                  </div>
                 </div>
                 <div className="flex justify-start gap-3 bg-black/50 p-6 rounded-2xl border border-white/5">
                   {[...Array(10)].map((_, i) => {
@@ -466,7 +482,11 @@ const PlayerView = () => {
                     {activeStatusDropdown === 'sede' && (
                       <div className="absolute top-full left-0 right-0 mt-2 bg-[#0e0e0e] border border-white/10 rounded-xl overflow-hidden flex flex-col z-20 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-200">
                         {['Estável', 'Sedento', 'Desidratado', 'Colapso'].map((estado, idx) => (
-                          <button key={idx} onClick={() => { handleUpdate('sede', idx); setActiveStatusDropdown(null); }} className="px-4 py-3 text-[10px] uppercase font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors text-left border-b border-white/5 last:border-none">
+                          <button 
+                            key={idx} 
+                            onClick={() => { handleUpdate('sede', idx); setActiveStatusDropdown(null); }} 
+                            className="w-full px-4 py-3 text-[10px] uppercase font-bold text-slate-400 hover:bg-white/5 hover:text-white transition-colors text-center border-b border-white/5 last:border-none"
+                          >
                             {estado}
                           </button>
                         ))}
